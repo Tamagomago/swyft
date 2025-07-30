@@ -1,0 +1,26 @@
+# Node dependencies
+node_modules
+# Build output
+.next
+out
+# TypeScript build artifacts
+dist
+build
+# Environment files
+.env*
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+# Misc
+coverage
+public
+static
+# Ignore all minified files
+*.min.js
+*.min.css
+# Next.js image optimization cache
+.cache
+# OS-specific files
+.DS_Store
+Thumbs.db
