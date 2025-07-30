@@ -8,12 +8,11 @@ function ThemeToggle() {
   const setTheme = useThemeStore((state) => state.setTheme);
   console.log(theme);
   useEffect(() => {
-    if (!theme) {
-      setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    }
     if (theme) {
       document.cookie = `theme=${theme};path=/;`;
       document.querySelector('html')?.setAttribute('data-theme', theme);
+    } else {
+      setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     }
   }, [theme, setTheme]);
 
