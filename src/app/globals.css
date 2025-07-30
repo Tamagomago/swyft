@@ -7,22 +7,22 @@
 
   [data-theme="light"] {
     --color-background: #F9FAFB;
-    --color-foreground: #18181B;
-    --color-border: #30363d;
+    --color-foreground: #171717;
+    --color-border: #232323;
     --color-input-background: #FFFFFF;
     --color-input-border: #30363d;
-    --color-input-text: #18181B;
-    --color-muted: #848d97;
+    --color-input-text: #171717;
+    --color-muted: #7b7b7b;
   }
 
   [data-theme="dark"] {
-    --color-background: #18181B;
+    --color-background: #171717;
     --color-foreground: #F9FAFB;
-    --color-border: #30363d;
+    --color-border: #232323;
     --color-input-background: #232326;
     --color-input-border: #30363d;
     --color-input-text: #F9FAFB;
-    --color-muted: #848d97;
+    --color-muted: #7b7b7b;
   }
 }
 
