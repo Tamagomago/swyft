@@ -53,7 +53,7 @@ function LoginForm() {
           <div className={'w-full flex flex-col gap-2'}>
             <Label htmlFor={'email'}>Email</Label>
             <Input
-              className={`${error ? 'border-error bg-error/10! ring-error' : ''}`}
+              className={`${error ? 'border-error bg-error/10! ring-error' : ''} ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
               id={'email'}
               type={'email'}
               placeholder={'you@example.com'}
@@ -69,13 +69,13 @@ function LoginForm() {
               <Label htmlFor={'password'}>Password</Label>
               <Link
                 href={'/auth/forgot-password'}
-                className={'text-muted font-medium text-sm hover:underline hover:decoration-1'}
+                className={'text-muted font-medium text-sm hover:underline hover:text-foreground'}
               >
                 Forgot Password?
               </Link>
             </div>
             <Input
-              className={`${error ? 'border-error bg-error/10! ring-error' : ''}`}
+              className={`${error ? 'border-error bg-error/10! ring-error' : ''} ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
               id={'password'}
               type={'password'}
               placeholder={'••••••••'}
@@ -87,7 +87,7 @@ function LoginForm() {
           </div>
 
           {/* Login Button */}
-          <div className={'mt-7 w-full'}>
+          <div className={'mt-3 w-full'}>
             <Button
               type={'submit'}
               className={`bg-button-background w-full text-button-foreground ${isLoading ? 'cursor-not-allowed bg-button-hover! opacity-50' : ''}`}
