@@ -68,7 +68,7 @@ function LoginForm() {
             <div className={'flex justify-between'}>
               <Label htmlFor={'password'}>Password</Label>
               <Link
-                href={'test'}
+                href={'/auth/forgot-password'}
                 className={'text-muted font-medium text-sm hover:underline hover:decoration-1'}
               >
                 Forgot Password?
