@@ -11,6 +11,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import Link from 'next/link';
 
 function LoginForm() {
   const [email, setEmail] = React.useState('');
@@ -48,6 +49,7 @@ function LoginForm() {
       </AuthHeader>
       <form onSubmit={handleLogin}>
         <AuthContent>
+          {/* Email */}
           <div className={'w-full flex flex-col gap-2'}>
             <Label htmlFor={'email'}>Email</Label>
             <Input
@@ -60,8 +62,18 @@ function LoginForm() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             />
           </div>
+
+          {/* Password */}
           <div className={'w-full flex flex-col gap-2'}>
-            <Label htmlFor={'password'}>Password</Label>
+            <div className={'flex justify-between'}>
+              <Label htmlFor={'password'}>Password</Label>
+              <Link
+                href={'test'}
+                className={'text-muted font-medium text-sm hover:underline hover:decoration-1'}
+              >
+                Forgot Password?
+              </Link>
+            </div>
             <Input
               className={`${error ? 'border-error bg-error/10! ring-error' : ''}`}
               id={'password'}
