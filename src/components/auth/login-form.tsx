@@ -96,6 +96,17 @@ function LoginForm() {
               {isLoading ? 'Logging in ...' : 'Login'}
             </Button>
           </div>
+
+          {/* Redirect to Sign-up */}
+          <div className={'w-full flex text-sm justify-center text-muted'}>
+            Don&apos;t have an account?
+            <Link
+              href={'/auth/sign-up'}
+              className={'hover:underline text-sm! hover:text-foreground ml-2'}
+            >
+              Sign Up Now
+            </Link>
+          </div>
         </AuthContent>
       </form>
     </AuthCard>
