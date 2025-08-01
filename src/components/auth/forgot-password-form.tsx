@@ -54,7 +54,7 @@ function ForgotPasswordForm() {
           <AuthHeader>
             <AuthTitle>Forgot your password?</AuthTitle>
             <AuthDescription>
-              Type in your email and we'll send you a link to reset your password
+              Type in your email and we&apos;ll send you a link to reset your password
             </AuthDescription>
           </AuthHeader>
           <form onSubmit={handleForgotPassword}>
