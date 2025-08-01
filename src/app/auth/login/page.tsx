@@ -1,6 +1,6 @@
 import LoginForm from '@/components/auth/login-form';
 
-function LoginPage() {
+function Page() {
   return (
     <div className={' flex h-full items-center justify-center font-600 text-foreground'}>
       <LoginForm />
@@ -8,4 +8,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default Page;
