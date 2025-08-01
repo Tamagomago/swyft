@@ -2,7 +2,7 @@ import { Noto_Sans_Georgian } from 'next/font/google';
 import React from 'react';
 import { Metadata } from 'next';
 import './globals.css';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/navbar';
 import { cookies } from 'next/headers';
 
 const georgian = Noto_Sans_Georgian({

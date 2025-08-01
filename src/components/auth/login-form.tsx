@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import AuthTitle from '@/components/ui/AuthTitle';
-import AuthDescription from '@/components/ui/AuthDescription';
-import AuthCard from '@/components/ui/AuthCard';
-import AuthHeader from '@/components/ui/AuthHeader';
-import AuthContent from '@/components/ui/AuthContent';
-import Label from '@/components/ui/Label';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
+import AuthTitle from '@/components/ui/auth-title';
+import AuthDescription from '@/components/ui/auth-description';
+import AuthCard from '@/components/ui/auth-card';
+import AuthHeader from '@/components/ui/auth-header';
+import AuthContent from '@/components/ui/auth-content';
+import Label from '@/components/ui/label';
+import Input from '@/components/ui/input';
+import Button from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
