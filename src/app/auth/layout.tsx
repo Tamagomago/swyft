@@ -1,11 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
 
-export const metadata: Metadata = {
-  title: 'Login | Swyft',
-  description: 'Authentication layout for the application',
-};
-
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-center md:grid md:grid-cols-3  w-screen  h-screen bg-background">

@@ -1,4 +1,11 @@
 import LoginForm from '@/components/auth/login-form';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Login | Swyft',
+  keywords: ['Swyft', 'login', 'authentication', 'account access'],
+  description: 'Access your Swyft account. Login to manage your profile.',
+};
 
 function Page() {
   return (

@@ -1,6 +1,13 @@
 import React from 'react';
 import AuthCard from '@/components/ui/auth-card';
 import AuthTitle from '@/components/ui/auth-title';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Error | Swyft',
+  keywords: ['Swyft', 'error', 'authentication', 'issue'],
+  description: 'An error occurred during authentication. Please try again.',
+};
 
 async function Page({ searchParams }: { searchParams: Promise<{ error: string }> }) {
   const params = await searchParams;
