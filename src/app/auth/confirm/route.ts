@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        redirect('/protected');
+        redirect('/home');
       } else {
         redirect('/auth/login');
       }

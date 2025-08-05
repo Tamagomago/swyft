@@ -33,7 +33,7 @@ function LoginForm() {
 
       if (error) throw error;
       console.log('Login successful');
-      router.push('/protected');
+      router.push('/home');
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred.');
     } finally {
