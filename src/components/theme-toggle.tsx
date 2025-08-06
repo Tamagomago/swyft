@@ -27,10 +27,12 @@ function ThemeToggle() {
     >
       <span className={'text-foreground relative flex items-center justify-center aspect-square'}>
         <IoSunny
-          className={`absolute w-16 aspect-square transition-transform duration-300 ${theme === 'dark' ? 'scale-100 rotate-0' : 'scale-0 rotate-180'} `}
+          className={`absolute aspect-square transition-transform duration-300 ${theme === 'dark' ? 'scale-100 rotate-0' : 'scale-0 rotate-180'} `}
+          size={20}
         />
         <IoMoon
-          className={`absolute w-16 aspect-square transition-transform duration-300 ${theme === 'dark' ? 'scale-0 rotate-180' : 'scale-100 rotate-0'} `}
+          className={`absolute aspect-square transition-transform duration-300 ${theme === 'dark' ? 'scale-0 rotate-180' : 'scale-100 rotate-0'} `}
+          size={20}
         />
       </span>
     </Button>
