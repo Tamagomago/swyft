@@ -1,11 +1,10 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @layer base {
-
-  [data-theme="light"] {
+  [data-theme='light'] {
     --color-background: #fafafa;
     --color-foreground: #171717;
     --color-border: #dfdfdf;
@@ -18,9 +17,10 @@
     --color-button-border: #232323;
     --color-button-foreground: #fafafa;
     --color-button-hover: #272727;
+    --color-sidebar-background: #ededed;
   }
 
-  [data-theme="dark"] {
+  [data-theme='dark'] {
     --color-background: #171717;
     --color-foreground: #fafafa;
     --color-border: #232323;
@@ -33,6 +33,7 @@
     --color-button-border: #dfdfdf;
     --color-button-foreground: #171717;
     --color-button-hover: #dcdcdc;
+    --color-sidebar-background: #202020;
   }
 }
 
@@ -52,8 +53,10 @@
   --color-button-border: var(--color-button-border);
   --color-button-foreground: var(--color-button-foreground);
   --color-button-hover: var(--color-button-hover);
+  --color-sidebar-background: var(--color-sidebar-background);
 }
 
-html, body {
+html,
+body {
   @apply m-0 p-0 box-border;
 }

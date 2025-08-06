@@ -4,7 +4,7 @@ import NotesList from '@/components/sidebar/notes-list';
 
 function Sidebar() {
   return (
-    <div className={'flex flex-col gap-5 pt-25 px-10 h-full w-full bg-muted/20'}>
+    <div className={'flex flex-col gap-5 pt-25 px-10 h-full w-full bg-sidebar-background'}>
       <Controls />
       <NotesList />
     </div>
