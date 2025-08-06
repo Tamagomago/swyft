@@ -1,4 +1,5 @@
 import ThemeToggle from './theme-toggle';
+import Link from 'next/link';
 
 function Navbar() {
   return (
@@ -7,7 +8,9 @@ function Navbar() {
         'z-1 flex items-center justify-between w-[95%] py-5 px-3 bg-transparent absolute top-0 text-foreground'
       }
     >
-      <h1 className={'text-ctm-foreground text-2xl font-bold'}>Swyft</h1>
+      <Link href={'/home'}>
+        <h1 className={'text-ctm-foreground text-2xl font-bold'}>Swyft</h1>
+      </Link>
       <ThemeToggle />
     </nav>
   );
