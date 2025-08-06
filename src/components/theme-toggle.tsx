@@ -2,6 +2,8 @@
 
 import { useThemeStore } from '@/store/theme';
 import { useEffect } from 'react';
+import Button from '@/components/ui/button';
+import { IoSunny, IoMoon } from 'react-icons/io5';
 
 function ThemeToggle() {
   const theme = useThemeStore((state) => state.theme);
@@ -17,9 +19,21 @@ function ThemeToggle() {
   }, [theme, setTheme]);
 
   return (
-    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-      <span className={'text-ctm-foreground'}>Toggle</span>
-    </button>
+    <Button
+      className={
+        'bg-transparent hover:bg-transparent border-none ring-0 focus:outline-none! focus:ring-0!'
+      }
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+    >
+      <span className={'text-foreground relative flex items-center justify-center w-8 h-8'}>
+        <IoSunny
+          className={`absolute h-5 w-5 transition-transform duration-300 ${theme === 'dark' ? 'scale-100 rotate-0' : 'scale-0 rotate-180'} `}
+        />
+        <IoMoon
+          className={`absolute w-5 transition-transform duration-300 ${theme === 'dark' ? 'scale-0 rotate-180' : 'scale-100 rotate-0'} `}
+        />
+      </span>
+    </Button>
   );
 }
 
