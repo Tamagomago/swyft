@@ -20,11 +20,11 @@ function HamburgerToggle({ className }: HamburgerToggleProps) {
     >
       <span className={'text-foreground relative flex items-center justify-center aspect-square'}>
         <RiMenuFill
-          className={`absolute aspect-square transition-transform duration-300 ${isOpen ? 'scale-0 rotate-180' : 'scale-100 rotate-180'} `}
+          className={`absolute aspect-square transition-transform duration-300 ${isOpen ? 'scale-0 rotate-180' : 'scale-100 rotate-0'} `}
           size={20}
         />
         <RiCloseFill
-          className={`absolute aspect-square transition-transform duration-300 ${!isOpen ? 'scale-0 rotate-180' : 'scale-100 rotate-180'} `}
+          className={`absolute aspect-square transition-transform duration-300 ${!isOpen ? 'scale-0 rotate-180' : 'scale-100 rotate-0'} `}
           size={20}
         />
       </span>
