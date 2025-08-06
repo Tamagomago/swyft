@@ -99,10 +99,10 @@ function LoginForm() {
 
           {/* Redirect to Sign-up */}
           <div className={'w-full flex text-sm justify-center text-muted'}>
-            Don&apos;t have an account?
+            Don&apos;t have an account? &nbsp;
             <Link
               href={'/auth/sign-up'}
-              className={'hover:underline text-sm! hover:text-foreground ml-2'}
+              className={'hover:underline text-sm! hover:text-foreground'}
             >
               Sign Up Now
             </Link>
