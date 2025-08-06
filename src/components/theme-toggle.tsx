@@ -21,16 +21,16 @@ function ThemeToggle() {
   return (
     <Button
       className={
-        'bg-transparent hover:bg-transparent border-none ring-0 focus:outline-none! focus:ring-0!'
+        'bg-transparent hover:bg-transparent border-none ring-0 focus:outline-none! focus:ring-0! aspect-square'
       }
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
     >
-      <span className={'text-foreground relative flex items-center justify-center w-8 h-8'}>
+      <span className={'text-foreground relative flex items-center justify-center aspect-square'}>
         <IoSunny
-          className={`absolute h-5 w-5 transition-transform duration-300 ${theme === 'dark' ? 'scale-100 rotate-0' : 'scale-0 rotate-180'} `}
+          className={`absolute w-16 aspect-square transition-transform duration-300 ${theme === 'dark' ? 'scale-100 rotate-0' : 'scale-0 rotate-180'} `}
         />
         <IoMoon
-          className={`absolute w-5 transition-transform duration-300 ${theme === 'dark' ? 'scale-0 rotate-180' : 'scale-100 rotate-0'} `}
+          className={`absolute w-16 aspect-square transition-transform duration-300 ${theme === 'dark' ? 'scale-0 rotate-180' : 'scale-100 rotate-0'} `}
         />
       </span>
     </Button>
