@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import React from 'react';
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
