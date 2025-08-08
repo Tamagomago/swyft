@@ -11,11 +11,11 @@ interface SidebarProps {
 
 function Sidebar({ className }: SidebarProps) {
   const { isOpen, close } = useSidebarStore();
-  let sidebarRef = React.useRef<HTMLDivElement>(null);
+  const sidebarRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     console.log('from sidebar', isOpen);
-    let handler = (e: MouseEvent | TouchEvent) => {
+    const handler = (e: MouseEvent | TouchEvent) => {
       if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node) && isOpen) {
         close();
       }
@@ -23,7 +23,7 @@ function Sidebar({ className }: SidebarProps) {
 
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [isOpen]);
+  }, [isOpen, close]);
   return (
     <div
       className={`
