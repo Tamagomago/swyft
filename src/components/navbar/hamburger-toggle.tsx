@@ -1,7 +1,7 @@
 'use client';
 
 import { RiSideBarLine } from 'react-icons/ri';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Button from '@/components/ui/button';
 import { useSidebarStore } from '@/store/sidebar';
 
