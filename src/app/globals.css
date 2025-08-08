@@ -34,6 +34,7 @@
     --color-button-foreground: #171717;
     --color-button-hover: #dcdcdc;
     --color-sidebar-background: #202020;
+    --color-skeleton-background: #555555;
   }
 }
 
@@ -54,6 +55,7 @@
   --color-button-foreground: var(--color-button-foreground);
   --color-button-hover: var(--color-button-hover);
   --color-sidebar-background: var(--color-sidebar-background);
+  --color-skeleton-background: var(--color-skeleton-background);
 }
 
 html,
