@@ -11,7 +11,7 @@ function Navbar() {
     >
       <HamburgerToggle className={'md:hidden'} />
       <Link href={'/home'}>
-        <h1 className={'text-ctm-foreground text-2xl font-bold'}>Swyft</h1>
+        <h1 className={'text-foreground text-2xl font-bold'}>Swyft</h1>
       </Link>
       <ThemeToggle />
     </nav>
