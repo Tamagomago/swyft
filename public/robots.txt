@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+Allow: /auth/login
+Allow: /auth/sign-up
+
+Disallow: /auth/confirm
+Disallow: /auth/error
+Disallow: /auth/forgot-password
+Disallow: /auth/update-password
+
+Disallow: /home/
+
