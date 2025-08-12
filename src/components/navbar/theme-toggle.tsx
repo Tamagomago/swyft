@@ -8,7 +8,7 @@ import { IoSunny, IoMoon } from 'react-icons/io5';
 function ThemeToggle() {
   const theme = useThemeStore((state) => state.theme);
   const setTheme = useThemeStore((state) => state.setTheme);
-  console.log(theme);
+
   useEffect(() => {
     if (theme) {
       document.cookie = `theme=${theme};path=/;`;
