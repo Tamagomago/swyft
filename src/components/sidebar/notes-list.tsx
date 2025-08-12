@@ -1,24 +1,35 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Notes } from '../../../types/supabase';
+import { Notes } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
-import { getUserNotes } from '@/lib/notes';
+import { createNote, getUserNotes } from '@/lib/notes';
 import SkeletonList from '@/components/ui/skeleton-list';
 import { useRouter } from 'next/navigation';
 
-function NotesList() {
-  const [data, setData] = useState<Notes[] | null>(null);
+interface NoteListProps {
+  isCreating: boolean;
+  handleCancelCreate: () => void;
+  handleCreated: () => void;
+}
+
+function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListProps) {
+  const [notes, setNotes] = useState<Notes[] | null>(null);
   const [error, setError] = useState<string | PostgrestError | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedNote, setSelectedNote] = useState<string>('');
-  const router = useRouter();
+  const [tempNoteTitle, setTempNoteTitle] = useState<string>('');
+  const [createLoading, setCreateLoading] = useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
+  const router = useRouter();
+  console.log('from notes list', isCreating);
+
+  // Fetch user notes when the component mounts
   useEffect(() => {
     (async () => {
       try {
         const { data, error } = await getUserNotes();
-        if (error) throw error;
-        setData(data);
+        setNotes(data);
       } catch (error: unknown) {
         setError(
           error instanceof Error ? error.message : 'An error occurred while fetching notes.',
@@ -27,16 +38,57 @@ function NotesList() {
         setIsLoading(false);
       }
     })();
-  }, [data]);
+  }, []);
+
+  useEffect(() => {
+    if (isCreating) {
+      setTempNoteTitle('');
+      inputRef.current?.focus();
+    }
+  }, [isCreating]);
+
+  const submitCreate = async () => {
+    const title = tempNoteTitle.trim();
+    if (!title) {
+      handleCancelCreate();
+      return;
+    }
+    setCreateLoading(true);
+    try {
+      const { data, error } = await createNote({ title } as Notes);
+      if (error) throw error;
+      if (data) {
+        setNotes((prev) => (prev ? [data, ...prev] : [data]));
+        setSelectedNote(data.id);
+        router.push(`/home/${data.id}`);
+      }
+      handleCreated();
+    } catch (error: unknown) {
+      console.log(error);
+      setError(error instanceof Error ? error.message : 'An error occurred while creating notes.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      await submitCreate();
+    } else if (e.key === 'Escape') {
+      handleCreated();
+    }
+  };
+
   return (
     <div className={'font-medium text-sm text-muted'}>
       {isLoading ? (
         <SkeletonList count={7} />
       ) : error ? (
         <p className={'text-muted'}>{error as string}</p>
-      ) : data && data.length > 0 ? (
-        <ul>
-          {data.map((note) => (
+      ) : notes && notes.length > 0 ? (
+        <ul className={'flex flex-col gap-1'}>
+          {notes.map((note) => (
             <li
               key={note.id}
               className={`
@@ -49,9 +101,35 @@ function NotesList() {
                 router.push(`/home/${note.id}`);
               }}
             >
-              {note.title}: {note.content}
+              {note.title}
             </li>
           ))}
+          {isCreating && (
+            <li
+              className="
+                py-1 px-1.5 rounded-md cursor-pointer transition-all truncate
+                hover:bg-muted/20 hover:scale-102
+                focus-within:ring-2 focus-within:ring-muted focus-within:bg-muted/20 disabled:opacity-60
+              "
+            >
+              <input
+                type="text"
+                className="
+                  w-full block bg-transparent outline-none
+                  text-sm placeholder:text-muted
+                "
+                ref={inputRef}
+                value={tempNoteTitle}
+                onChange={(e) => setTempNoteTitle(e.target.value)}
+                disabled={createLoading}
+                onKeyDown={handleKeyDown}
+                onBlur={async () => {
+                  if (!tempNoteTitle.trim()) handleCancelCreate();
+                  else await submitCreate();
+                }}
+              />
+            </li>
+          )}
         </ul>
       ) : (
         <p>No notes found.</p>
