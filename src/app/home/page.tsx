@@ -1,7 +1,13 @@
-'use client';
 import React from 'react';
 import { RiStickyNoteAddLine } from 'react-icons/ri';
 import Button from '@/components/ui/button';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Home | Swyft',
+  keywords: ['Swyft', 'home', 'dashboard', 'welcome'],
+  description: 'Welcome to Swyft, your personal note-taking app.',
+};
 
 function Page() {
   return (
