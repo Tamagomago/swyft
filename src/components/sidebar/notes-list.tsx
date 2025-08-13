@@ -5,6 +5,7 @@ import { PostgrestError } from '@supabase/supabase-js';
 import { createNote, getUserNotes } from '@/lib/notes';
 import SkeletonList from '@/components/ui/skeleton-list';
 import { useRouter } from 'next/navigation';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 
 interface NoteListProps {
   isCreating: boolean;
@@ -20,8 +21,11 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
   const [tempNoteTitle, setTempNoteTitle] = useState<string>('');
   const [createLoading, setCreateLoading] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const [hoveredNoteId, setHoveredNoteId] = useState<string | null>(null);
 
   const router = useRouter();
+
+  console.log('Note hovered:', hoveredNoteId);
 
   // Fetch user notes when the component mounts
   useEffect(() => {
@@ -90,10 +94,13 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
         <ul className={'flex flex-col gap-1'}>
           {notes.map((note) => (
             <li
+              onMouseEnter={() => setHoveredNoteId(note.id)}
+              onMouseLeave={() => setHoveredNoteId(null)}
               key={note.id}
               className={`
-                hover:bg-muted/20 py-1 px-1.5 rounded-md cursor-pointer 
+                hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer 
                 transition-all hover:font-bold hover:scale-102 truncate
+                flex justify-between items-center
                 ${selectedNote === note.id ? 'bg-muted/20 font-bold' : ''}
                 `}
               onClick={() => {
@@ -101,7 +108,10 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
                 router.push(`/home/${note.id}`);
               }}
             >
-              {note.title}
+              <span>{note.title}</span>
+              {hoveredNoteId === note.id && (
+                <RiDeleteBin6Line size={15} className={'hover:text-error cursor-pointer'} />
+              )}
             </li>
           ))}
           {isCreating && (
