@@ -29,3 +29,10 @@ export async function createNote({
     .single();
   return { data, error };
 }
+
+export async function deleteNote(
+  id: string,
+): Promise<{ data: Notes[] | null; error: PostgrestError | string | null }> {
+  const { data, error } = await supabase.from('notes').delete().eq('id', id).select();
+  return { data, error };
+}
