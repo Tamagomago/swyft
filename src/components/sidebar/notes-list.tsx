@@ -22,7 +22,6 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const router = useRouter();
-  console.log('from notes list', isCreating);
 
   // Fetch user notes when the component mounts
   useEffect(() => {
@@ -30,6 +29,7 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
       try {
         const { data, error } = await getUserNotes();
         setNotes(data);
+        if (error) throw error;
       } catch (error: unknown) {
         setError(
           error instanceof Error ? error.message : 'An error occurred while fetching notes.',
