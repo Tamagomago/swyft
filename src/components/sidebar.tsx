@@ -31,7 +31,6 @@ function Sidebar({ className }: SidebarProps) {
   }, [setIsCreating]);
 
   useEffect(() => {
-    console.log('from sidebar', isOpen);
     const handler = (e: MouseEvent | TouchEvent) => {
       if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node) && isOpen) {
         close();
