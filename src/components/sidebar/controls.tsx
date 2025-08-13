@@ -1,7 +1,6 @@
 import React from 'react';
 import { RiStickyNoteAddLine } from 'react-icons/ri';
 import { RiFolderAddLine } from 'react-icons/ri';
-import { RiDeleteBin6Line } from 'react-icons/ri';
 
 interface ControlsProps {
   onAddNote: () => void;
@@ -18,7 +17,6 @@ function Controls({ onAddNote }: ControlsProps) {
           onClick={onAddNote}
         />
         <RiFolderAddLine className={'text-muted hover:text-foreground'} size={17} />
-        <RiDeleteBin6Line className={'text-muted hover:text-foreground'} size={17} />
       </div>
     </div>
   );
