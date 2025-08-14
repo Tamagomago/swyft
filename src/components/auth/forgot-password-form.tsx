@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import AuthCard from '@/components/ui/auth-card';
-import AuthHeader from '@/components/ui/auth-header';
-import AuthTitle from '@/components/ui/auth-title';
-import AuthDescription from '@/components/ui/auth-description';
-import AuthContent from '@/components/ui/auth-content';
+import AuthCard from '@/components/ui/auth/auth-card';
+import AuthHeader from '@/components/ui/auth/auth-header';
+import AuthTitle from '@/components/ui/auth/auth-title';
+import AuthDescription from '@/components/ui/auth/auth-description';
+import AuthContent from '@/components/ui/auth/auth-content';
 import Label from '@/components/ui/label';
 import Input from '@/components/ui/input';
 import Button from '@/components/ui/button';

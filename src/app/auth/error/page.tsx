@@ -1,6 +1,6 @@
 import React from 'react';
-import AuthCard from '@/components/ui/auth-card';
-import AuthTitle from '@/components/ui/auth-title';
+import AuthCard from '@/components/ui/auth/auth-card';
+import AuthTitle from '@/components/ui/auth/auth-title';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
