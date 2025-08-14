@@ -30,9 +30,7 @@ export async function createNote({
   return { data, error };
 }
 
-export async function deleteNote(
-  id: string,
-): Promise<{ data: Notes[] | null; error: PostgrestError | string | null }> {
-  const { data, error } = await supabase.from('notes').delete().eq('id', id).select();
-  return { data, error };
+export async function deleteNote(id: string): Promise<{ error: PostgrestError | string | null }> {
+  const { error } = await supabase.from('notes').delete().eq('id', id);
+  return { error };
 }

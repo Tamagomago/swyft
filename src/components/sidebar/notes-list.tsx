@@ -2,10 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import { Notes } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
-import { createNote, getUserNotes } from '@/lib/notes';
+import { createNote, deleteNote, getUserNotes } from '@/lib/notes';
 import SkeletonList from '@/components/ui/skeleton-list';
 import { useRouter } from 'next/navigation';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import Modal from '@/components/ui/modal/modal';
+import ModalTitle from '@/components/ui/modal/modal-title';
+import ModalDescription from '../ui/modal/modal-description';
+import Button from '@/components/ui/button';
 
 interface NoteListProps {
   isCreating: boolean;
@@ -22,10 +26,14 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
   const [createLoading, setCreateLoading] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [hoveredNoteId, setHoveredNoteId] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [noteToDelete, setNoteToDelete] = useState<Notes | null>(null);
 
   const router = useRouter();
 
-  console.log('Note hovered:', hoveredNoteId);
+  useEffect(() => {
+    console.log('Note hovered:', hoveredNoteId);
+  }, [hoveredNoteId]);
 
   // Fetch user notes when the component mounts
   useEffect(() => {
@@ -110,7 +118,15 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
             >
               <span>{note.title}</span>
               {hoveredNoteId === note.id && (
-                <RiDeleteBin6Line size={15} className={'hover:text-error cursor-pointer'} />
+                <RiDeleteBin6Line
+                  size={15}
+                  className={'hover:text-error cursor-pointer'}
+                  onClick={(e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+                    e.stopPropagation();
+                    setShowDeleteModal(true);
+                    setNoteToDelete(note);
+                  }}
+                />
               )}
             </li>
           ))}
@@ -142,7 +158,80 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
           )}
         </ul>
       ) : (
-        <p>No notes found.</p>
+        <>
+          <ul>
+            {isCreating ? (
+              <li
+                className="
+                py-1 px-1.5 rounded-md cursor-pointer transition-all truncate
+                hover:bg-muted/20 hover:scale-102
+                focus-within:ring-2 focus-within:ring-muted focus-within:bg-muted/20 disabled:opacity-60
+              "
+              >
+                <input
+                  type="text"
+                  className="
+                  w-full block bg-transparent outline-none
+                  text-sm placeholder:text-muted
+                "
+                  ref={inputRef}
+                  value={tempNoteTitle}
+                  onChange={(e) => setTempNoteTitle(e.target.value)}
+                  disabled={createLoading}
+                  onKeyDown={handleKeyDown}
+                  onBlur={async () => {
+                    if (!tempNoteTitle.trim()) handleCancelCreate();
+                    else await submitCreate();
+                  }}
+                />
+              </li>
+            ) : (
+              <p>No notes found.</p>
+            )}
+          </ul>
+        </>
+      )}
+      {showDeleteModal && (
+        <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+          <ModalTitle>Delete Note</ModalTitle>
+          <ModalDescription>
+            Are you sure you want to delete "{noteToDelete?.title}"?
+          </ModalDescription>
+          <div className={'flex justify-end gap-2'}>
+            <Button
+              className={
+                'bg-background border-1 hover:bg-muted/20 border-muted/50 py-1.5! flex gap-1 items-center text-foreground'
+              }
+              onClick={() => setShowDeleteModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className={
+                'bg-red-500 hover:bg-red-600 hover:border-red-500 border-error py-1.5! flex gap-1 items-center text-white'
+              }
+              onClick={async () => {
+                const { error: delErr } = await deleteNote(noteToDelete!.id);
+                if (delErr) {
+                  setError(delErr);
+                  return;
+                }
+                const { data, error: noteErr } = await getUserNotes();
+                if (noteErr) {
+                  setError(noteErr);
+                  return;
+                }
+                if (data) {
+                  setNotes(data);
+                  setShowDeleteModal(false);
+                }
+              }}
+            >
+              <RiDeleteBin6Line />
+              Delete
+            </Button>
+          </div>
+        </Modal>
       )}
     </div>
   );
