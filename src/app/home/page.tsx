@@ -30,7 +30,7 @@ function Page() {
           </span>
         </Button>
         <span className="flex items-center px-2 py-0.5 text-xs font-mono my-2 text-foreground rounded">
-          Ctrl + N
+          Ctrl + K
         </span>
       </div>
 

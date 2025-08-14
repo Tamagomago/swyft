@@ -15,6 +15,19 @@ function Sidebar({ className }: SidebarProps) {
   const [isCreating, setIsCreating] = React.useState<boolean>(false);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey && e.key === 'k') || (e.metaKey && e.key.toLowerCase() === 'k')) {
+        e.preventDefault();
+        handleStartCreate();
+        console.log('isCreating:', isCreating);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
     if (!isOpen) setIsCreating(false);
   }, [isOpen]);
 
