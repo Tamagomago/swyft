@@ -30,7 +30,6 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
   const [hoveredNoteId, setHoveredNoteId] = useState<string | null>(null);
 
   // Form
-  const [tempNoteTitle, setTempNoteTitle] = useState<string>('');
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Error
@@ -65,15 +64,7 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
     })();
   }, []);
 
-  useEffect(() => {
-    if (isCreating) {
-      setTempNoteTitle('');
-      inputRef.current?.focus();
-    }
-  }, [isCreating]);
-
-  const submitCreate = async () => {
-    const title = tempNoteTitle.trim();
+  const submitCreate = async (title: string) => {
     if (!title) {
       handleCancelCreate();
       return;
