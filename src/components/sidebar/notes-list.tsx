@@ -31,10 +31,6 @@ function NotesList({ isCreating, handleCancelCreate, handleCreated }: NoteListPr
 
   const router = useRouter();
 
-  useEffect(() => {
-    console.log('Note hovered:', hoveredNoteId);
-  }, [hoveredNoteId]);
-
   // Fetch user notes when the component mounts
   useEffect(() => {
     (async () => {

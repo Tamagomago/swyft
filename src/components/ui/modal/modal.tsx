@@ -17,7 +17,27 @@ function Modal({ children, isOpen, onClose }: ModalProps) {
       }
     };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('touchstart', handler);
+      document.removeEventListener('mousedown', handler);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
+
+  // Scroll Lock
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
   }, []);
 
   return (
