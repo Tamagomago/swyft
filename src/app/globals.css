@@ -3,62 +3,77 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-@layer base {
-  [data-theme='light'] {
-    --color-background: #fafafa;
-    --color-foreground: #171717;
-    --color-border: #dfdfdf;
-    --color-muted: #8e8e8e;
-    --color-ring: #eaeaea;
-    --color-input-background: #ececec;
-    --color-button-background: #171717;
-    --color-button-ring: #202020;
-    --color-button-muted: #7b7b7b;
-    --color-button-border: #232323;
-    --color-button-foreground: #fafafa;
-    --color-button-hover: #272727;
-    --color-sidebar-background: #ededed;
-  }
 
-  [data-theme='dark'] {
-    --color-background: #171717;
-    --color-foreground: #fafafa;
-    --color-border: #232323;
-    --color-muted: #7b7b7b;
-    --color-ring: #202020;
-    --color-input-background: #1d1d1d;
-    --color-button-background: #fafafa;
-    --color-button-ring: #eaeaea;
-    --color-button-muted: #8e8e8e;
-    --color-button-border: #dfdfdf;
-    --color-button-foreground: #171717;
-    --color-button-hover: #dcdcdc;
-    --color-sidebar-background: #202020;
-    --color-skeleton-background: #555555;
-  }
+:root {
+	--focus-ring: #202020;
+	--error-color: #e5484d;
+}
+
+/* Light theme */
+[data-theme='light'] {
+	--app-surface: #fafafa;
+	--app-text-primary: #171717;
+	--app-border: #dfdfdf;
+	--app-text-muted: #8e8e8e;
+
+	--input-surface: #ececec;
+	--input-border: #dfdfdf;
+	--input-text: #171717;
+
+	--button-surface: #171717;
+	--button-ring: #202020;
+	--button-text-muted: #7b7b7b;
+	--button-border: #232323;
+	--button-text: #fafafa;
+	--button-surface-hover: #272727;
+
+	--sidebar-surface: #ededed;
+	--skeleton-surface: #ececec;
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+	--app-surface: #171717;
+	--app-text-primary: #fafafa;
+	--app-border: #373737;
+	--app-text-muted: #7b7b7b;
+
+	--input-surface: #1d1d1d;
+	--input-border: #232323;
+	--input-text: #fafafa;
+
+	--button-surface: #fafafa;
+	--button-ring: #eaeaea;
+	--button-text-muted: #8e8e8e;
+	--button-border: #dfdfdf;
+	--button-text: #171717;
+	--button-surface-hover: #dcdcdc;
+
+	--sidebar-surface: #202020;
+	--skeleton-surface: #555555;
 }
 
 @theme {
-  --color-error: #e5484d;
-  --color-background: var(--color-background);
-  --color-foreground: var(--color-foreground);
-  --color-border: var(--color-border);
-  --color-input-background: var(--color-input-background);
-  --color-input-border: var(--color-input-border);
-  --color-input-text: var(--color-input-text);
-  --color-muted: var(--color-muted);
-  --color-ring: var(--color-ring);
-  --color-button-background: var(--color-button-background);
-  --color-button-ring: var(--color-button-ring);
-  --color-button-muted: var(--color-button-muted);
-  --color-button-border: var(--color-button-border);
-  --color-button-foreground: var(--color-button-foreground);
-  --color-button-hover: var(--color-button-hover);
-  --color-sidebar-background: var(--color-sidebar-background);
-  --color-skeleton-background: var(--color-skeleton-background);
+	--color-error: var(--error-color);
+	--color-background: var(--app-surface);
+	--color-foreground: var(--app-text-primary);
+	--color-border: var(--app-border);
+	--color-muted: var(--app-text-muted);
+	--color-ring: var(--focus-ring);
+	--color-input-background: var(--input-surface);
+	--color-input-border: var(--input-border);
+	--color-input-text: var(--input-text);
+	--color-button-background: var(--button-surface);
+	--color-button-ring: var(--button-ring);
+	--color-button-muted: var(--button-text-muted);
+	--color-button-border: var(--button-border);
+	--color-button-foreground: var(--button-text);
+	--color-button-hover: var(--button-surface-hover);
+	--color-sidebar-background: var(--sidebar-surface);
+	--color-skeleton-background: var(--skeleton-surface);
 }
 
 html,
 body {
-  @apply m-0 p-0 box-border;
+	@apply m-0 p-0 box-border;
 }
