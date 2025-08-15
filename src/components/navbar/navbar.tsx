@@ -1,4 +1,4 @@
-import ThemeToggle from './navbar/theme-toggle';
+import ThemeToggle from './theme-toggle';
 import Link from 'next/link';
 import HamburgerToggle from '@/components/navbar/hamburger-toggle';
 
