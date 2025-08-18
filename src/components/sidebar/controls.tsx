@@ -4,9 +4,10 @@ import { RiFolderAddLine } from 'react-icons/ri';
 
 interface ControlsProps {
   onAddNote: () => void;
+  onAddFolder: () => void;
 }
 
-function Controls({ onAddNote }: ControlsProps) {
+function Controls({ onAddNote, onAddFolder }: ControlsProps) {
   return (
     <div className={'w-full flex justify-between items-center border-b-2 border-border pb-2'}>
       <h1 className={'text-muted font-bold lg:text-sm text-xs'}>NOTES</h1>
@@ -16,7 +17,11 @@ function Controls({ onAddNote }: ControlsProps) {
           size={17}
           onClick={onAddNote}
         />
-        <RiFolderAddLine className={'text-muted hover:text-foreground'} size={17} />
+        <RiFolderAddLine
+          className={'text-muted hover:text-foreground'}
+          size={17}
+          onClick={onAddFolder}
+        />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import React, { useCallback, useEffect } from 'react';
 import Controls from '@/components/sidebar/controls';
 import NotesList from '@/components/sidebar/notes-list';
 import { useSidebarStore } from '@/store/sidebar';
+import useCreating from '@/hooks/useCreating';
 
 interface SidebarProps {
   className?: string;
@@ -12,14 +13,18 @@ interface SidebarProps {
 function Sidebar({ className }: SidebarProps) {
   const { isOpen, close } = useSidebarStore();
   const sidebarRef = React.useRef<HTMLDivElement>(null);
-  const [isCreating, setIsCreating] = React.useState<boolean>(false);
+
+  const noteCreation = useCreating();
+  const folderCreation = useCreating();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey && e.key === 'k') || (e.metaKey && e.key.toLowerCase() === 'k')) {
+      if (
+        (e.ctrlKey && e.key.toLowerCase() === 'k') ||
+        (e.metaKey && e.key.toLowerCase() === 'k')
+      ) {
         e.preventDefault();
-        handleStartCreate();
-        console.log('isCreating:', isCreating);
+        noteCreation.start();
       }
     };
 
@@ -28,20 +33,11 @@ function Sidebar({ className }: SidebarProps) {
   }, []);
 
   useEffect(() => {
-    if (!isOpen) setIsCreating(false);
+    if (!isOpen) {
+      noteCreation.cancel();
+      folderCreation.cancel();
+    }
   }, [isOpen]);
-
-  const handleStartCreate = useCallback(() => {
-    setIsCreating(true);
-  }, [setIsCreating]);
-
-  const handleCancelCreate = useCallback(() => {
-    setIsCreating(false);
-  }, [setIsCreating]);
-
-  const handleCreated = useCallback(() => {
-    setIsCreating(false);
-  }, [setIsCreating]);
 
   useEffect(() => {
     const handler = (e: MouseEvent | TouchEvent) => {
@@ -53,6 +49,7 @@ function Sidebar({ className }: SidebarProps) {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [isOpen, close]);
+
   return (
     <div
       className={`
@@ -64,12 +61,8 @@ function Sidebar({ className }: SidebarProps) {
       `}
       ref={sidebarRef}
     >
-      <Controls onAddNote={() => handleStartCreate()} />
-      <NotesList
-        isCreating={isCreating}
-        handleCancelCreate={handleCancelCreate}
-        handleCreated={handleCreated}
-      />
+      <Controls onAddNote={() => noteCreation.start} onAddFolder={folderCreation.start} />
+      <NotesList noteCreation={noteCreation} folderCreation={folderCreation} />
     </div>
   );
 }
