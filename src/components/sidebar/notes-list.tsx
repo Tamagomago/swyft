@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Notes } from '@/types/supabase';
+import { Folders, Notes } from '@/types/supabase';
 import { usePathname, useRouter } from 'next/navigation';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import Modal from '@/components/ui/modal/modal';
@@ -12,11 +12,14 @@ import SkeletonList from '@/components/ui/skeleton-list';
 import useCreating from '@/hooks/useCreating';
 import useNotes from '@/hooks/useNotes';
 import useFolders from '@/hooks/useFolders';
-import { createNote, deleteNote } from '@/lib/notes';
+import { createFolder, createNote, deleteFolder, deleteNote } from '@/lib/notes';
 import { useQueryClient } from '@tanstack/react-query';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { RiFolder2Line } from 'react-icons/ri';
 import { MdNotes } from 'react-icons/md';
+import { isNotes } from '@/lib/utils';
+
+type CreateKind = 'note' | 'folder';
 
 interface NoteListProps {
   noteCreation: ReturnType<typeof useCreating>;
@@ -29,8 +32,8 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   const { data: folders, isLoading: foldersLoading, error: foldersError } = useFolders();
 
   // State
-  const [selectedNoteId, setSelectedNoteId] = useState<string>('');
-  const [deleteTargetId, setDeleteTargetId] = useState<Notes | null>(null);
+  const [selectedId, setSelectedId] = useState<string>('');
+  const [deleteTarget, setDeleteTarget] = useState<Notes | Folders | null>(null);
   const [createLoading, setCreateLoading] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,29 +43,42 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   const pathname = usePathname();
 
   const handleNoteClick = (noteId: string) => {
-    setSelectedNoteId(noteId);
+    setSelectedId(noteId);
     router.push(`/home/${noteId}`);
   };
 
-  const handleDeleteClick = (note: Notes) => {
-    setDeleteTargetId(note);
+  const handleDeleteClick = (item: Folders | Notes) => {
+    setDeleteTarget(item);
   };
 
-  const submitCreate = async (title: string) => {
-    if (!title) {
-      noteCreation.cancel();
+  const creatingKind: CreateKind | null = noteCreation.isCreating
+    ? 'note'
+    : folderCreation.isCreating
+      ? 'folder'
+      : null;
+
+  const submitCreate = async (item: Notes | Folders) => {
+    const isNoteItem = isNotes(item);
+    const entry = isNoteItem ? noteCreation : folderCreation;
+    const titleOrName = isNoteItem ? item.title : item.name;
+    if (!titleOrName) {
+      entry.cancel();
       return;
     }
     setCreateLoading(true);
     try {
-      const { data: note, error } = await createNote({ title } as Notes);
-      if (error) throw error;
-      if (note) {
-        await queryClient.invalidateQueries({ queryKey: ['notes'] });
+      if (isNoteItem) {
+        const { data: note, error } = await createNote(item);
+        if (error) throw error;
+        if (note) await queryClient.invalidateQueries({ queryKey: ['notes'] });
+      } else {
+        const { data: folder, error } = await createFolder(item);
+        if (error) throw error;
+        if (folder) await queryClient.invalidateQueries({ queryKey: ['folders'] });
       }
-      noteCreation.created();
+      entry.created();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred while creating note.');
+      setError(err instanceof Error ? err.message : 'An error occurred while creating.');
     } finally {
       setCreateLoading(false);
     }
@@ -95,9 +111,12 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
                 tabIndex={index}
                 onMouseEnter={() => setHoveredId(folder.id)}
                 onMouseLeave={() => setHoveredId(null)}
-                className="hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer
+                className={`
+                  hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer
                   transition-all hover:font-bold hover:scale-102 truncate
-                  flex justify-between items-center"
+                  flex justify-between items-center
+                  ${selectedId === folder.id ? 'bg-muted/20 font-bold' : ''}
+                `}
               >
                 <div className="flex items-center">
                   <RiFolder2Line size={17} className={'mr-1.5'} />
@@ -109,6 +128,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
                     className="hover:text-error cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
+                      handleDeleteClick(folder);
                     }}
                   />
                 )}
@@ -131,7 +151,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
                   hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer 
                   transition-all hover:font-bold hover:scale-102 truncate
                   flex justify-between items-center
-                  ${selectedNoteId === note.id ? 'bg-muted/20 font-bold' : ''}
+                  ${selectedId === note.id ? 'bg-muted/20 font-bold' : ''}
                 `}
               >
                 <div className={'flex items-center'}>
@@ -154,8 +174,8 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
           </>
         )}
 
-        {/* Create Note */}
-        {noteCreation.isCreating && (
+        {/* Create Note or Folder */}
+        {(noteCreation.isCreating || folderCreation.isCreating) && (
           <li
             tabIndex={notes && notes.length > 0 ? notes.length : 0}
             className={`
@@ -168,8 +188,12 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
           >
             <NoteInput
               disabled={createLoading}
-              onSubmit={submitCreate}
-              onCancel={noteCreation.cancel}
+              onSubmit={(input) =>
+                creatingKind === 'note'
+                  ? submitCreate({ title: input } as Notes)
+                  : submitCreate({ name: input } as Folders)
+              }
+              onCancel={creatingKind === 'note' ? noteCreation.cancel : folderCreation.cancel}
             />
             <span>
               {createLoading && <AiOutlineLoading3Quarters size={13} className={'animate-spin'} />}
@@ -177,39 +201,51 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
           </li>
         )}
 
-        {/* No notes*/}
+        {/* No notes */}
         {(!notes || notes.length === 0) &&
           (!folders || folders.length === 0) &&
-          !noteCreation.isCreating && <p>No notes found.</p>}
+          !noteCreation.isCreating &&
+          !folderCreation.isCreating && <p>No notes found.</p>}
       </ul>
 
       {/* Delete modal */}
-      {deleteTargetId && (
-        <Modal isOpen onClose={() => setDeleteTargetId(null)}>
+      {deleteTarget && (
+        <Modal isOpen onClose={() => setDeleteTarget(null)}>
           <ModalTitle>Delete Note</ModalTitle>
           <ModalDescription>
-            Are you sure you want to delete &quot;{deleteTargetId?.title}&quot;?
+            Are you sure you want to delete &quot;
+            {deleteTarget && isNotes(deleteTarget) ? deleteTarget.title : deleteTarget.name}&quot;?
           </ModalDescription>
           <div className="flex justify-end gap-2">
             <Button
               className="bg-background border-1 hover:bg-muted/20 border-muted/50 py-1.5! flex gap-1 items-center text-foreground"
-              onClick={() => setDeleteTargetId(null)}
+              onClick={() => setDeleteTarget(null)}
             >
               Cancel
             </Button>
             <Button
               className="bg-red-500 hover:bg-red-600 hover:border-red-500 border-error py-1.5! flex gap-1 items-center text-white"
               onClick={async () => {
-                const { error } = await deleteNote(deleteTargetId!.id);
-                if (error) {
-                  setError(error instanceof Error ? error.message : 'An error occurred.');
-                  return;
+                if (isNotes(deleteTarget)) {
+                  const { error } = await deleteNote(deleteTarget.id);
+                  if (error) {
+                    setError(error instanceof Error ? error.message : 'An error occurred.');
+                    return;
+                  }
+                  await queryClient.invalidateQueries({ queryKey: ['notes'] });
+                  if (pathname.endsWith(deleteTarget.id)) {
+                    router.push('/home');
+                  }
+                } else {
+                  const { error } = await deleteFolder(deleteTarget.id);
+                  if (error) {
+                    setError(error instanceof Error ? error.message : 'An error occurred.');
+                    return;
+                  }
+                  await queryClient.invalidateQueries({ queryKey: ['folders'] });
+                  // TODO - handle redirect to home page if the deleted folder contains the note currently being viewed
                 }
-                setDeleteTargetId(null);
-                await queryClient.invalidateQueries({ queryKey: ['notes'] });
-                if (pathname.endsWith(deleteTargetId!.id)) {
-                  router.push('/home');
-                }
+                setDeleteTarget(null);
               }}
             >
               <RiDeleteBin6Line />

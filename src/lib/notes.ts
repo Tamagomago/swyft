@@ -51,7 +51,7 @@ export async function createFolder({
 }: Folders): Promise<{ data: Folders; error: PostgrestError | string | null }> {
   if (!user || userError) throw new Error('User not authenticated');
   const { data, error } = await supabase
-    .from('notes')
+    .from('folders')
     .insert({ name, user_id: user?.id })
     .select()
     .single();
