@@ -15,6 +15,8 @@ import useFolders from '@/hooks/useFolders';
 import { createNote, deleteNote } from '@/lib/notes';
 import { useQueryClient } from '@tanstack/react-query';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { RiFolder2Line } from 'react-icons/ri';
+import { MdNotes } from 'react-icons/md';
 
 interface NoteListProps {
   noteCreation: ReturnType<typeof useCreating>;
@@ -30,7 +32,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   const [selectedNoteId, setSelectedNoteId] = useState<string>('');
   const [deleteTargetId, setDeleteTargetId] = useState<Notes | null>(null);
   const [createLoading, setCreateLoading] = useState(false);
-  const [hoveredNoteId, setHoveredNoteId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
@@ -83,100 +85,102 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
 
   return (
     <div className="font-medium text-sm text-muted">
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-1">
         {/* Folders */}
         {folders && folders.length > 0 && (
-          <li>
-            <h3 className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Folders</h3>
-            <ul className="flex flex-col gap-1">
-              {folders.map((folder) => (
-                <li
-                  key={folder.id}
-                  className="hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer transition-all hover:font-bold hover:scale-102 truncate"
-                >
-                  {folder.name}
-                </li>
-              ))}
-            </ul>
-          </li>
+          <>
+            {folders.map((folder, index) => (
+              <li
+                key={folder.id}
+                tabIndex={index}
+                onMouseEnter={() => setHoveredId(folder.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                className="hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer
+                  transition-all hover:font-bold hover:scale-102 truncate
+                  flex justify-between items-center"
+              >
+                <div className="flex items-center">
+                  <RiFolder2Line size={17} className={'mr-1.5'} />
+                  <span>{folder.name}</span>
+                </div>
+                {hoveredId === folder.id && (
+                  <RiDeleteBin6Line
+                    size={15}
+                    className="hover:text-error cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  />
+                )}
+              </li>
+            ))}
+          </>
         )}
 
         {/* Notes */}
-        {notes && notes.length > 0 ? (
-          <li>
-            <ul className="flex flex-col gap-1">
-              {notes.map((note, index) => (
-                <li
-                  tabIndex={index}
-                  key={note.id}
-                  onMouseEnter={() => setHoveredNoteId(note.id)}
-                  onMouseLeave={() => setHoveredNoteId(null)}
-                  onClick={() => handleNoteClick(note.id)}
-                  className={`
-                    hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer 
-                    transition-all hover:font-bold hover:scale-102 truncate
-                    flex justify-between items-center
-                    ${selectedNoteId === note.id ? 'bg-muted/20 font-bold' : ''}
-                  `}
-                >
+        {notes && notes.length > 0 && (
+          <>
+            {notes.map((note, index) => (
+              <li
+                tabIndex={index}
+                key={note.id}
+                onMouseEnter={() => setHoveredId(note.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onClick={() => handleNoteClick(note.id)}
+                className={`
+                  hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer 
+                  transition-all hover:font-bold hover:scale-102 truncate
+                  flex justify-between items-center
+                  ${selectedNoteId === note.id ? 'bg-muted/20 font-bold' : ''}
+                `}
+              >
+                <div className={'flex items-center'}>
+                  <MdNotes size={17} className={'mr-1.5'} />
                   <span>{note.title}</span>
-                  {hoveredNoteId === note.id && (
-                    <RiDeleteBin6Line
-                      size={15}
-                      className="hover:text-error cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(note);
-                      }}
-                    />
-                  )}
-                </li>
-              ))}
+                </div>
 
-              {noteCreation.isCreating && (
-                <li
-                  tabIndex={notes.length}
-                  className={`
-                    py-1 px-1.5 rounded-md cursor-pointer transition-all truncate
-                    hover:bg-muted/10 hover:scale-102
-                    focus-within:ring-2 focus-within:ring-muted/50 focus-within:bg-muted/20 disabled:opacity-60
-                    flex justify-between items-center
-                    ${createLoading ? 'opacity-40 cursor-not-allowed' : ''}`}
-                >
-                  <NoteInput
-                    disabled={createLoading}
-                    onSubmit={submitCreate}
-                    onCancel={noteCreation.cancel}
+                {hoveredId === note.id && (
+                  <RiDeleteBin6Line
+                    size={15}
+                    className="hover:text-error cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(note);
+                    }}
                   />
-                  <>
-                    {createLoading && (
-                      <AiOutlineLoading3Quarters size={13} className={'animate-spin'} />
-                    )}
-                  </>
-                </li>
-              )}
-            </ul>
-          </li>
-        ) : (
+                )}
+              </li>
+            ))}
+          </>
+        )}
+
+        {/* Create Note */}
+        {noteCreation.isCreating && (
           <li
-            tabIndex={0}
-            className="
+            tabIndex={notes && notes.length > 0 ? notes.length : 0}
+            className={`
               py-1 px-1.5 rounded-md cursor-pointer transition-all truncate
               hover:bg-muted/10 hover:scale-102
               focus-within:ring-2 focus-within:ring-muted/50 focus-within:bg-muted/20 disabled:opacity-60
-            "
+              flex justify-between items-center
+              ${createLoading ? 'opacity-40 cursor-not-allowed' : ''}
+             `}
           >
-            {noteCreation.isCreating ? (
-              <NoteInput
-                disabled={createLoading}
-                onSubmit={submitCreate}
-                onCancel={noteCreation.cancel}
-              />
-            ) : (
-              <p>No notes found.</p>
-            )}
+            <NoteInput
+              disabled={createLoading}
+              onSubmit={submitCreate}
+              onCancel={noteCreation.cancel}
+            />
+            <span>
+              {createLoading && <AiOutlineLoading3Quarters size={13} className={'animate-spin'} />}
+            </span>
           </li>
         )}
+
+        {/* No notes*/}
+        {(!notes || notes.length === 0) &&
+          (!folders || folders.length === 0) &&
+          !noteCreation.isCreating && <p>No notes found.</p>}
       </ul>
 
       {/* Delete modal */}
