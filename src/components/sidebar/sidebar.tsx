@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Controls from '@/components/sidebar/controls';
 import NotesList from '@/components/sidebar/notes-list';
 import { useSidebarStore } from '@/store/sidebar';
 import useCreating from '@/hooks/useCreating';
+import { QueryClient } from '@tanstack/query-core';
+import { QueryClientProvider } from '@tanstack/react-query';
 
 interface SidebarProps {
   className?: string;
@@ -16,6 +18,8 @@ function Sidebar({ className }: SidebarProps) {
 
   const noteCreation = useCreating();
   const folderCreation = useCreating();
+
+  const queryClient = React.useMemo(() => new QueryClient(), []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -51,19 +55,21 @@ function Sidebar({ className }: SidebarProps) {
   }, [isOpen, close]);
 
   return (
-    <div
-      className={`
+    <QueryClientProvider client={queryClient}>
+      <div
+        className={`
         ${className}
         flex flex-col gap-5 h-full w-[80%]
         pt-25 px-10 bg-sidebar-background
         transform transition-transform duration-200 ease-in-out
         ${isOpen ? 'translate-x-0 z-3' : '-translate-x-full md:translate-x-0'}
       `}
-      ref={sidebarRef}
-    >
-      <Controls onAddNote={() => noteCreation.start} onAddFolder={folderCreation.start} />
-      <NotesList noteCreation={noteCreation} folderCreation={folderCreation} />
-    </div>
+        ref={sidebarRef}
+      >
+        <Controls onAddNote={noteCreation.start} onAddFolder={folderCreation.start} />
+        <NotesList noteCreation={noteCreation} folderCreation={folderCreation} />
+      </div>
+    </QueryClientProvider>
   );
 }
 

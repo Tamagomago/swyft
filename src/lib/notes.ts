@@ -1,20 +1,19 @@
 import { createClient } from '@/utils/supabase/client';
-import { Notes } from '@/types/supabase';
+import { Folders, Notes } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
 
 const supabase = createClient();
 const {
   data: { user },
+  error: userError,
 } = await supabase.auth.getUser();
 
 export async function getUserNotes(): Promise<{
   data: Notes[] | null;
   error: PostgrestError | null | string;
 }> {
-  if (!user) throw new Error('User not authenticated');
-
+  if (!user || userError) throw new Error('User not authenticated');
   const { data, error } = await supabase.from('notes').select('*').eq('user_id', user.id);
-
   return { data, error };
 }
 
@@ -22,6 +21,7 @@ export async function createNote({
   title,
   content = '',
 }: Notes): Promise<{ data: Notes; error: PostgrestError | string | null }> {
+  if (!user || userError) throw new Error('User not authenticated');
   const { data, error } = await supabase
     .from('notes')
     .insert({ title, content, user_id: user?.id })
@@ -32,5 +32,31 @@ export async function createNote({
 
 export async function deleteNote(id: string): Promise<{ error: PostgrestError | string | null }> {
   const { error } = await supabase.from('notes').delete().eq('id', id);
+  return { error };
+}
+
+export async function getUserFolders(): Promise<{
+  data: Folders[] | null;
+  error: PostgrestError | null | string;
+}> {
+  if (!user || userError) throw new Error('User not authenticated');
+  const { data, error } = await supabase.from('folders').select('*').eq('user_id', user.id);
+  return { data, error };
+}
+
+export async function createFolder({
+  name,
+}: Folders): Promise<{ data: Folders; error: PostgrestError | string | null }> {
+  if (!user || userError) throw new Error('User not authenticated');
+  const { data, error } = await supabase
+    .from('notes')
+    .insert({ name, user_id: user?.id })
+    .select()
+    .single();
+  return { data, error };
+}
+
+export async function deleteFolder(id: string): Promise<{ error: PostgrestError | string | null }> {
+  const { error } = await supabase.from('folders').delete().eq('id', id);
   return { error };
 }
