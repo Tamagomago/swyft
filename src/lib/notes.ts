@@ -8,6 +8,7 @@ const {
   error: userError,
 } = await supabase.auth.getUser();
 
+// Notes
 export async function getUserNotes(): Promise<{
   data: Notes[] | null;
   error: PostgrestError | null | string;
@@ -35,6 +36,7 @@ export async function deleteNote(id: string): Promise<{ error: PostgrestError | 
   return { error };
 }
 
+// Folders
 export async function getUserFolders(): Promise<{
   data: Folders[] | null;
   error: PostgrestError | null | string;

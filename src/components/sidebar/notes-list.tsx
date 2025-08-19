@@ -184,7 +184,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
         <Modal isOpen onClose={() => setDeleteTargetId(null)}>
           <ModalTitle>Delete Note</ModalTitle>
           <ModalDescription>
-            Are you sure you want to delete "{deleteTargetId?.title}"?
+            Are you sure you want to delete &quot;{deleteTargetId?.title}&quot;?
           </ModalDescription>
           <div className="flex justify-end gap-2">
             <Button

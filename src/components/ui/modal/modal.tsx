@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface ModalProps {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ function Modal({ children, isOpen, onClose }: ModalProps) {
       document.removeEventListener('touchstart', handler);
       document.removeEventListener('mousedown', handler);
     };
-  }, []);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -33,12 +33,12 @@ function Modal({ children, isOpen, onClose }: ModalProps) {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, []);
+  }, [isOpen, onClose]);
 
   // Scroll Lock
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
-  }, []);
+  }, [isOpen]);
 
   return (
     <div

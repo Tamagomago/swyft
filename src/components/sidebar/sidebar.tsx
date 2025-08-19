@@ -34,14 +34,14 @@ function Sidebar({ className }: SidebarProps) {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [noteCreation]);
 
   useEffect(() => {
     if (!isOpen) {
       noteCreation.cancel();
       folderCreation.cancel();
     }
-  }, [isOpen]);
+  }, [isOpen, noteCreation.cancel, folderCreation.cancel]);
 
   useEffect(() => {
     const handler = (e: MouseEvent | TouchEvent) => {
