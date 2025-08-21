@@ -1,7 +1,7 @@
 import { getUserNotes } from '@/lib/notes';
 import { useQuery } from '@tanstack/react-query';
 
-export default function useNotes() {
+export default function useGetNotes() {
   return useQuery({
     queryKey: ['notes'],
     queryFn: async () => {

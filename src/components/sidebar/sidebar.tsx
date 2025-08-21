@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Controls from '@/components/sidebar/controls';
-import NotesList from '@/components/sidebar/notes-list';
+import NotesList from '@/components/sidebar/notes-list/notes-list';
 import { useSidebarStore } from '@/store/sidebar';
 import useCreating from '@/hooks/useCreating';
 import { QueryClient } from '@tanstack/query-core';
@@ -58,12 +58,12 @@ function Sidebar({ className }: SidebarProps) {
     <QueryClientProvider client={queryClient}>
       <div
         className={`
-        ${className}
-        flex flex-col gap-5 h-full w-[80%] z-3
-        pt-10 px-10 bg-sidebar-background
-        transform transition-transform duration-200 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-      `}
+          ${className}
+          flex flex-col gap-5 h-full w-[80%] z-3
+          pt-10 px-10 bg-sidebar-background
+          transform transition-transform duration-200 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}
         ref={sidebarRef}
       >
         <Controls onAddNote={noteCreation.start} onAddFolder={folderCreation.start} />

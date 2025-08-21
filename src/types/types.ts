@@ -14,3 +14,4 @@ export interface Folders {
   name: string;
   createdAt: Date;
 }
+export type CreateKind = 'note' | 'folder';

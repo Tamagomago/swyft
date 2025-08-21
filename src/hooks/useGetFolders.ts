@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getUserFolders } from '@/lib/notes';
 
-export default function useFolders() {
+export default function useGetFolders() {
   return useQuery({
     queryKey: ['folders'],
     queryFn: async () => {
