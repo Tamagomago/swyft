@@ -4,16 +4,15 @@ import { CreateKind, Folders, Notes } from '@/types/types';
 import { useRouter } from 'next/navigation';
 import SkeletonList from '@/components/ui/skeleton-list';
 import useCreating from '@/hooks/useCreating';
-import useGetNotes from '@/hooks/useGetNotes';
-import useGetFolders from '@/hooks/useGetFolders';
-import { createFolder, createNote, deleteFolder, deleteNote } from '@/lib/notes';
+import useGetItems from '@/hooks/useGetItems';
 import { isNotes } from '@/lib/utils';
 import NoteItem from '@/components/sidebar/notes-list/note-item';
 import FolderItem from '@/components/sidebar/notes-list/folder-item';
-import CreateItem from '@/components/sidebar/notes-list/create-item';
+import ItemEntry from '@/components/sidebar/notes-list/item-entry';
 import DeleteModal from '@/components/sidebar/notes-list/delete-modal';
-import { useItemCreate } from '@/hooks/useCreateItem';
-import { useItemDelete } from '@/hooks/useDeleteItem';
+import { useCreateItem } from '@/hooks/useCreateItem';
+import { useDeleteItem } from '@/hooks/useDeleteItem';
+import { createItem, deleteItem } from '@/lib/notes';
 
 interface NoteListProps {
   noteCreation: ReturnType<typeof useCreating>;
@@ -22,12 +21,12 @@ interface NoteListProps {
 
 function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   // Hooks
-  const { createItem, isCreating, error: createError } = useItemCreate();
-  const { deleteItem, error: deleteError } = useItemDelete();
+  const { handleCreateItem, isCreating, error: createError } = useCreateItem();
+  const { handleDeleteItem, error: deleteError } = useDeleteItem();
 
   // Data
-  const { data: notes, isLoading: notesLoading, error: notesError } = useGetNotes();
-  const { data: folders, isLoading: foldersLoading, error: foldersError } = useGetFolders();
+  const { data: notes, isLoading: notesLoading, error: notesError } = useGetItems('notes');
+  const { data: folders, isLoading: foldersLoading, error: foldersError } = useGetItems('folders');
 
   // State
   const [selectedId, setSelectedId] = useState<string>('');
@@ -57,16 +56,16 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
 
   const submitCreate = async (item: Notes | Folders) => {
     if (isNotes(item)) {
-      return createItem(item, createNote, 'notes', noteCreation, 'note');
+      return handleCreateItem('notes', item, createItem, noteCreation, 'notes');
     }
-    return createItem(item, createFolder, 'folders', folderCreation, 'folder');
+    return handleCreateItem('folders', item, createItem, folderCreation, 'folders');
   };
 
   const confirmDelete = async (item: Notes | Folders) => {
     if (isNotes(item)) {
-      return deleteItem(item, deleteNote, 'notes', 'note', () => setDeleteTarget(null));
+      return handleDeleteItem('notes', item, deleteItem, 'notes', () => setDeleteTarget(null));
     }
-    return deleteItem(item, deleteFolder, 'folders', 'folder', () => setDeleteTarget(null));
+    return handleDeleteItem('folders', item, deleteItem, 'folders', () => setDeleteTarget(null));
   };
 
   if (notesLoading || foldersLoading) {
@@ -85,6 +84,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
           folders.length > 0 &&
           folders.map((folder, index) => (
             <FolderItem
+              key={folder.id}
               folder={folder}
               index={index}
               selectedId={selectedId}
@@ -112,7 +112,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
 
         {/* Create Note or Folder */}
         {(noteCreation.isCreating || folderCreation.isCreating) && (
-          <CreateItem
+          <ItemEntry
             disabled={isCreating}
             kind={creatingKind!}
             onSubmit={submitCreate}

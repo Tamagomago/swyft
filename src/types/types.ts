@@ -15,3 +15,9 @@ export interface Folders {
   createdAt: Date;
 }
 export type CreateKind = 'note' | 'folder';
+
+export type TableMap = {
+  notes: Notes;
+  folders: Folders;
+};
+export type Tables = keyof TableMap;

@@ -1,5 +1,5 @@
 import React from 'react';
-import NoteInput from '@/components/sidebar/note-input';
+import NoteInput from '@/components/sidebar/notes-list/note-input';
 import { CreateKind, Folders, Notes } from '@/types/types';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
@@ -10,7 +10,7 @@ interface CreateItemProps {
   onCancel: () => void;
 }
 
-function CreateItem({ kind, disabled, onCancel, onSubmit }: CreateItemProps) {
+function ItemEntry({ kind, disabled, onCancel, onSubmit }: CreateItemProps) {
   return (
     <li
       tabIndex={0}
@@ -36,4 +36,4 @@ function CreateItem({ kind, disabled, onCancel, onSubmit }: CreateItemProps) {
   );
 }
 
-export default CreateItem;
+export default ItemEntry;

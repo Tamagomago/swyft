@@ -1,37 +1,41 @@
 import { useState } from 'react';
-import { Notes, Folders } from '@/types/types';
+import { Notes, Folders, Tables, TableMap } from '@/types/types';
 import { PostgrestError } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import useCreating from '@/hooks/useCreating';
-import { isNotes } from '@/lib/utils';
 
-type CreateFn<T> = (item: T) => Promise<{ data: T | null; error: string | PostgrestError | null }>;
+type CreateFn<K extends Tables> = (
+  table: K,
+  item: Omit<TableMap[K], 'id' | 'user_id'>,
+) => Promise<{ data: TableMap[K] | null; error: PostgrestError | null | Error }>;
 
-export function useItemCreate() {
+export function useCreateItem() {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function createItem<T extends Notes | Folders>(
-    item: T,
-    createFn: CreateFn<T>,
-    queryKey: 'notes' | 'folders',
+  async function handleCreateItem<K extends Tables>(
+    table: K,
+    item: Omit<TableMap[K], 'id' | 'user_id'>,
+    createFn: CreateFn<K>,
     creation: ReturnType<typeof useCreating>,
     label: string,
   ) {
-    if (!(isNotes(item) ? item.title : item.name)) {
+    const isEmpty =
+      table === 'notes' ? !('title' in item && item.title) : !('name' in item && item.name);
+
+    if (isEmpty) {
       creation.cancel();
       return;
     }
 
     setIsCreating(true);
-
     try {
-      const { data, error } = await createFn(item);
+      const { data, error } = await createFn(table, item);
       if (error) throw error;
 
       if (data) {
-        await queryClient.invalidateQueries({ queryKey: [queryKey] });
+        await queryClient.invalidateQueries({ queryKey: [table] });
       }
       creation.created();
     } catch (err) {
@@ -41,5 +45,5 @@ export function useItemCreate() {
     }
   }
 
-  return { createItem, isCreating, error };
+  return { handleCreateItem, isCreating, error };
 }

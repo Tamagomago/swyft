@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client';
-import { Folders, Notes } from '@/types/types';
+import { TableMap, Tables } from '@/types/types';
 import { PostgrestError } from '@supabase/supabase-js';
 
 const supabase = createClient();
@@ -8,57 +8,32 @@ const {
   error: userError,
 } = await supabase.auth.getUser();
 
-// Notes
-export async function getUserNotes(): Promise<{
-  data: Notes[] | null;
-  error: PostgrestError | null | string;
-}> {
-  if (!user || userError) throw new Error('User not authenticated');
-  const { data, error } = await supabase.from('notes').select('*').eq('user_id', user.id);
-  return { data, error };
-}
-
-export async function createNote({
-  title,
-  content = '',
-}: Notes): Promise<{ data: Notes; error: PostgrestError | string | null }> {
+export async function createItem<T extends Tables>(
+  table: T,
+  item: Omit<TableMap[T], 'id' | 'user_id'>,
+): Promise<{ data: TableMap[T] | null; error: PostgrestError | null | Error }> {
   if (!user || userError) throw new Error('User not authenticated');
   const { data, error } = await supabase
-    .from('notes')
-    .insert({ title, content, user_id: user?.id })
+    .from(table)
+    .insert({ ...item, user_id: user.id })
     .select()
     .single();
   return { data, error };
 }
 
-export async function deleteNote(id: string): Promise<{ error: PostgrestError | string | null }> {
-  const { error } = await supabase.from('notes').delete().eq('id', id);
-  return { error };
-}
-
-// Folders
-export async function getUserFolders(): Promise<{
-  data: Folders[] | null;
-  error: PostgrestError | null | string;
-}> {
+export async function getItems<T extends Tables>(
+  table: T,
+): Promise<{ data: TableMap[T][] | null; error: PostgrestError | null | Error }> {
   if (!user || userError) throw new Error('User not authenticated');
-  const { data, error } = await supabase.from('folders').select('*').eq('user_id', user.id);
+  const { data, error } = await supabase.from(table).select('*').eq('user_id', user.id);
   return { data, error };
 }
 
-export async function createFolder({
-  name,
-}: Folders): Promise<{ data: Folders; error: PostgrestError | string | null }> {
+export async function deleteItem<T extends Tables>(
+  table: T,
+  id: string,
+): Promise<{ error: PostgrestError | null | Error }> {
   if (!user || userError) throw new Error('User not authenticated');
-  const { data, error } = await supabase
-    .from('folders')
-    .insert({ name, user_id: user?.id })
-    .select()
-    .single();
-  return { data, error };
-}
-
-export async function deleteFolder(id: string): Promise<{ error: PostgrestError | string | null }> {
-  const { error } = await supabase.from('folders').delete().eq('id', id);
+  const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', user.id);
   return { error };
 }
