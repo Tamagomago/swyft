@@ -28,8 +28,11 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   const { data: notes, isLoading: notesLoading, error: notesError } = useGetItems('notes');
   const { data: folders, isLoading: foldersLoading, error: foldersError } = useGetItems('folders');
 
+  // Filtered Data
+  const topLevelNotes = notes?.filter((note) => !note.folder_id) || [];
+  const folderNotes = notes?.filter((note) => note.folder_id) || [];
+
   // State
-  const [selectedId, setSelectedId] = useState<string>('');
   const [deleteTarget, setDeleteTarget] = useState<Notes | Folders | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -37,10 +40,6 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   const router = useRouter();
 
   // Handlers
-  const handleNoteClick = (noteId: string) => {
-    setSelectedId(noteId);
-    router.push(`/home/${noteId}`);
-  };
   const handleDeleteClick = (item: Folders | Notes) => {
     setDeleteTarget(item);
   };
@@ -77,7 +76,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   }
 
   return (
-    <div className="font-medium text-sm text-muted">
+    <div className="font-medium text-sm text-muted w-full h-full overflow-y-auto">
       <ul className="flex flex-col gap-1">
         {/* Folders */}
         {folders &&
@@ -86,8 +85,8 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
             <FolderItem
               key={folder.id}
               folder={folder}
+              notes={folderNotes.filter((note) => note.folder_id === folder.id)}
               index={index}
-              selectedId={selectedId}
               hoveredId={hoveredId}
               setHoveredId={setHoveredId}
               onDelete={handleDeleteClick}
@@ -95,17 +94,15 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
           ))}
 
         {/* Notes */}
-        {notes &&
-          notes.length > 0 &&
-          notes.map((note, index) => (
+        {topLevelNotes &&
+          topLevelNotes.length > 0 &&
+          topLevelNotes.map((note, index) => (
             <NoteItem
               key={note.id}
               index={index}
               note={note}
-              selectedId={selectedId}
               hoveredId={hoveredId}
               setHoveredId={setHoveredId}
-              onClick={handleNoteClick}
               onDelete={handleDeleteClick}
             />
           ))}
