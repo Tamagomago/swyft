@@ -15,9 +15,9 @@ function ItemEntry({ kind, disabled, onCancel, onSubmit }: CreateItemProps) {
     <li
       tabIndex={0}
       className={`
-        py-1 px-1.5 rounded-md cursor-pointer transition-all truncate
+        py-1 px-1.5 rounded-md cursor-pointer transition-all truncate w-full
         hover:bg-muted/10 hover:scale-102
-        focus-within:ring-2 focus-within:ring-muted/50 focus-within:bg-muted/20 disabled:opacity-60
+        focus-within:border-2 focus-within:border-muted/50 focus-within:bg-muted/20 disabled:opacity-60
         flex justify-between items-center
         ${disabled ? 'opacity-40 cursor-not-allowed' : ''}
       `}

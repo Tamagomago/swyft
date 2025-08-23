@@ -59,10 +59,10 @@ function Sidebar({ className }: SidebarProps) {
       <div
         className={`
           ${className}
-          flex flex-col gap-5 h-full w-[80%] z-3
+          flex flex-col gap-5 h-full w-[80%] z-3 max-w-xs
           pt-10 px-10 bg-sidebar-background
           transform transition-transform duration-200 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
         ref={sidebarRef}
       >

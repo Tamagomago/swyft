@@ -22,7 +22,7 @@ async function RootLayout({ children }: { children: React.ReactNode }) {
   const theme = cookieStore.get('theme')?.value || 'light';
   return (
     <html lang="en" data-theme={theme}>
-      <body className={`${georgian.variable} w-full min-h-screen flex justify-center`}>
+      <body className={`${georgian.variable} w-full min-h-[100dvh] flex justify-center`}>
         <Navbar />
         {children}
       </body>

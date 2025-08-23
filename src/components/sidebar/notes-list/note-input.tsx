@@ -45,7 +45,7 @@ export default function NoteInput({ onSubmit, onCancel, disabled }: NoteInputPro
       disabled={disabled}
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
-      className="bg-transparent outline-none! border-none! text-sm text-muted font-medium hover:font-bold placeholder:text-muted focus:ring-0! p-0! focus:border-none! focus:outline-none!"
+      className="!bg-transparent !border-none !outline-none !ring-0 !p-0 text-sm text-muted font-medium hover:font-bold placeholder:text-muted"
     />
   );
 }
