@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Notes, Folders, Tables, TableMap } from '@/types/types';
+import { Tables, TableMap } from '@/types/types';
 import { PostgrestError } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';

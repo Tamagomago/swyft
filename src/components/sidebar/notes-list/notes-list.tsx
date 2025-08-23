@@ -1,7 +1,6 @@
 'use client';
 import React, { useState } from 'react';
 import { CreateKind, Folders, Notes } from '@/types/types';
-import { useRouter } from 'next/navigation';
 import SkeletonList from '@/components/ui/skeleton-list';
 import useCreating from '@/hooks/useCreating';
 import useGetItems from '@/hooks/useGetItems';
@@ -13,6 +12,7 @@ import DeleteModal from '@/components/sidebar/notes-list/delete-modal';
 import { useCreateItem } from '@/hooks/useCreateItem';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { createItem, deleteItem } from '@/lib/notes';
+import { useUpdateItem } from '@/hooks/useUpdateItem';
 
 interface NoteListProps {
   noteCreation: ReturnType<typeof useCreating>;
@@ -35,9 +35,6 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   // State
   const [deleteTarget, setDeleteTarget] = useState<Notes | Folders | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-
-  // Router
-  const router = useRouter();
 
   // Handlers
   const handleDeleteClick = (item: Folders | Notes) => {
