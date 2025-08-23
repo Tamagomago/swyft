@@ -37,3 +37,16 @@ export async function deleteItem<T extends Tables>(
   const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', user.id);
   return { error };
 }
+
+export async function updateItem<T extends Tables>(
+  table: T,
+  item: TableMap[T],
+): Promise<{ error: PostgrestError | null | Error }> {
+  if (!user || userError) throw new Error('User not authenticated');
+  const { error } = await supabase
+    .from(table)
+    .update(item)
+    .eq('id', item.id)
+    .eq('user_id', user.id);
+  return { error };
+}
