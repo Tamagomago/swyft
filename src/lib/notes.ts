@@ -41,12 +41,13 @@ export async function deleteItem<T extends Tables>(
 export async function updateItem<T extends Tables>(
   table: T,
   item: TableMap[T],
-): Promise<{ error: PostgrestError | null | Error }> {
+): Promise<{ data: TableMap[T] | null; error: PostgrestError | null | Error }> {
   if (!user || userError) throw new Error('User not authenticated');
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from(table)
     .update(item)
     .eq('id', item.id)
     .eq('user_id', user.id);
-  return { error };
+  console.log(data, error);
+  return { data, error };
 }

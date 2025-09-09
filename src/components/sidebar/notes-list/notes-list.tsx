@@ -11,7 +11,7 @@ import ItemEntry from '@/components/sidebar/notes-list/item-entry';
 import DeleteModal from '@/components/sidebar/notes-list/delete-modal';
 import { useCreateItem } from '@/hooks/useCreateItem';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
-import { createItem, deleteItem } from '@/lib/notes';
+import { createItem, deleteItem, updateItem } from '@/lib/notes';
 import { useUpdateItem } from '@/hooks/useUpdateItem';
 
 interface NoteListProps {
@@ -23,23 +23,26 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   // Hooks
   const { handleCreateItem, isCreating, error: createError } = useCreateItem();
   const { handleDeleteItem, error: deleteError } = useDeleteItem();
+  const { handleUpdateItem, isUpdating, error: updateError } = useUpdateItem();
 
   // Data
   const { data: notes, isLoading: notesLoading, error: notesError } = useGetItems('notes');
   const { data: folders, isLoading: foldersLoading, error: foldersError } = useGetItems('folders');
 
-  // Filtered Data
-  const topLevelNotes = notes?.filter((note) => !note.folder_id) || [];
-  const folderNotes = notes?.filter((note) => note.folder_id) || [];
+  // Filtered data
+  const topLevelNotes = notes?.filter((n) => !n.folder_id) || [];
+  const folderNotesMap =
+    notes?.reduce<Record<string, Notes[]>>((acc, note) => {
+      if (note.folder_id) {
+        acc[note.folder_id] = acc[note.folder_id] || [];
+        acc[note.folder_id].push(note);
+      }
+      return acc;
+    }, {}) || {};
 
   // State
   const [deleteTarget, setDeleteTarget] = useState<Notes | Folders | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-
-  // Handlers
-  const handleDeleteClick = (item: Folders | Notes) => {
-    setDeleteTarget(item);
-  };
 
   // Context
   const creatingKind: CreateKind | null = noteCreation.isCreating
@@ -48,77 +51,70 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
       ? 'folder'
       : null;
 
-  const globalError = deleteError || createError || notesError || foldersError;
+  const globalError = deleteError || createError || notesError || foldersError || updateError;
 
+  // Handlers
   const submitCreate = async (item: Notes | Folders) => {
-    if (isNotes(item)) {
-      return handleCreateItem('notes', item, createItem, noteCreation, 'notes');
-    }
-    return handleCreateItem('folders', item, createItem, folderCreation, 'folders');
+    const type = isNotes(item) ? 'notes' : 'folders';
+    const creation = isNotes(item) ? noteCreation : folderCreation;
+    return await handleCreateItem(type, item, createItem, creation, type);
   };
 
-  const confirmDelete = async (item: Notes | Folders) => {
-    if (isNotes(item)) {
-      return handleDeleteItem('notes', item, deleteItem, 'notes', () => setDeleteTarget(null));
-    }
-    return handleDeleteItem('folders', item, deleteItem, 'folders', () => setDeleteTarget(null));
+  const submitDelete = async (item: Notes | Folders) => {
+    const type = isNotes(item) ? 'notes' : 'folders';
+    return await handleDeleteItem(type, item, deleteItem, type, () => setDeleteTarget(null));
   };
 
-  if (notesLoading || foldersLoading) {
-    return <SkeletonList count={7} />;
-  }
+  const submitUpdate = async (item: Notes | Folders) => {
+    const type = isNotes(item) ? 'notes' : 'folders';
+    return await handleUpdateItem(type, item, updateItem, type);
+  };
 
-  if (globalError) {
-    return <p className="text-muted">An error occurred.</p>;
-  }
+  // Early exits
+  if (notesLoading || foldersLoading) return <SkeletonList count={7} />;
+  if (globalError) return <p className="text-muted">An error occurred.</p>;
+
+  // Common props
+  const commonProps = { hoveredId, setHoveredId, onDelete: setDeleteTarget, isUpdating };
 
   return (
-    <div className="font-medium text-sm text-muted w-full h-full overflow-y-auto">
+    <div className="font-medium text-sm text-muted w-full h-full overflow-y-aut overflow-x-visible">
       <ul className="flex flex-col gap-1">
         {/* Folders */}
-        {folders &&
-          folders.length > 0 &&
-          folders.map((folder, index) => (
-            <FolderItem
-              key={folder.id}
-              folder={folder}
-              notes={folderNotes.filter((note) => note.folder_id === folder.id)}
-              index={index}
-              hoveredId={hoveredId}
-              setHoveredId={setHoveredId}
-              onDelete={handleDeleteClick}
-            />
-          ))}
+        {folders?.map((folder, index) => (
+          <FolderItem
+            key={folder.id}
+            folder={folder}
+            notes={folderNotesMap[folder.id] || []}
+            onRename={(f) => submitUpdate(f)}
+            index={index}
+            {...commonProps}
+          />
+        ))}
 
         {/* Notes */}
-        {topLevelNotes &&
-          topLevelNotes.length > 0 &&
-          topLevelNotes.map((note, index) => (
-            <NoteItem
-              key={note.id}
-              index={index}
-              note={note}
-              hoveredId={hoveredId}
-              setHoveredId={setHoveredId}
-              onDelete={handleDeleteClick}
-            />
-          ))}
+        {topLevelNotes?.map((note, index) => (
+          <NoteItem
+            key={note.id}
+            note={note}
+            index={index}
+            onRename={(n) => submitUpdate(n)}
+            {...commonProps}
+          />
+        ))}
 
-        {/* Create Note or Folder */}
-        {(noteCreation.isCreating || folderCreation.isCreating) && (
+        {/* Create Note/Folder */}
+        {creatingKind && (
           <ItemEntry
             disabled={isCreating}
-            kind={creatingKind!}
+            kind={creatingKind}
             onSubmit={submitCreate}
             onCancel={creatingKind === 'note' ? noteCreation.cancel : folderCreation.cancel}
           />
         )}
 
-        {/* No notes */}
-        {(!notes || notes.length === 0) &&
-          (!folders || folders.length === 0) &&
-          !noteCreation.isCreating &&
-          !folderCreation.isCreating && <p>No notes found.</p>}
+        {/* Empty state */}
+        {!notes?.length && !folders?.length && !creatingKind && <p>No notes found.</p>}
       </ul>
 
       {/* Delete modal */}
@@ -126,7 +122,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
         <DeleteModal
           target={deleteTarget}
           onCancel={() => setDeleteTarget(null)}
-          onConfirm={confirmDelete}
+          onConfirm={submitDelete}
         />
       )}
     </div>

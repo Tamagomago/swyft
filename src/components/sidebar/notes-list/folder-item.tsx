@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { RiDeleteBin6Line, RiFolder2Line, RiArrowRightSLine, RiFileEditLine } from 'react-icons/ri';
 import { Folders, Notes } from '@/types/types';
 import NoteItem from '@/components/sidebar/notes-list/note-item';
-import { useContextMenu } from '@/hooks/useContextMenu';
 import ContextMenu from '@/components/ContextMenu';
+import ItemEntry from '@/components/sidebar/notes-list/item-entry';
+import { isNotes } from '@/lib/utils';
+import { useRenameState } from '@/hooks/useRenameState';
+import { useContextMenuWithLongPress } from '@/hooks/useContextMenuWithLongPress';
 
 interface NotesFolderProps {
   folder: Folders;
@@ -12,31 +15,52 @@ interface NotesFolderProps {
   hoveredId: string | null;
   setHoveredId: (id: string | null) => void;
   onDelete: (item: Folders | Notes) => void;
+  onRename: (T: Notes | Folders) => Promise<void>;
+  isUpdating: boolean;
 }
 
-function FolderItem({ folder, notes, index, onDelete, hoveredId, setHoveredId }: NotesFolderProps) {
+function FolderItem({
+  folder,
+  notes,
+  index,
+  onDelete,
+  hoveredId,
+  setHoveredId,
+  onRename,
+  isUpdating,
+}: NotesFolderProps) {
   const [expanded, setExpanded] = useState(false);
   const toggleExpand = () => setExpanded((prev) => !prev);
-  const { openMenu, menu, closeMenu } = useContextMenu();
+  const { openMenu, menu, closeMenu, handleTouchStart, handleTouchEnd } =
+    useContextMenuWithLongPress<Notes | Folders>();
+  const { isRenaming, startRenaming, stopRenaming } = useRenameState();
   const contextMenuItems = [
     { icon: RiDeleteBin6Line, name: 'Delete', action: () => onDelete(folder) },
-    { icon: RiFileEditLine, name: 'Rename', action: () => {} },
+    {
+      icon: RiFileEditLine,
+      name: 'Rename',
+      action: () => {
+        startRenaming();
+        setExpanded(false);
+      },
+    },
   ];
 
-  // touch event handler
-  const timerRef = React.useRef<NodeJS.Timeout | null>(null);
-  const handleTouchStart = (e: React.MouseEvent | React.TouchEvent) => {
-    timerRef.current = setTimeout(() => {
-      openMenu(e, folder);
-    }, 600);
-  };
-
-  const handleTouchEnd = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  };
+  if (isRenaming) {
+    return (
+      <ItemEntry
+        kind={'folder'}
+        disabled={isUpdating}
+        onSubmit={async (input) => {
+          if (!isNotes(input)) {
+            await onRename?.({ ...folder, name: input.name });
+            stopRenaming();
+          }
+        }}
+        onCancel={() => stopRenaming()}
+      />
+    );
+  }
 
   return (
     <>
@@ -46,7 +70,7 @@ function FolderItem({ folder, notes, index, onDelete, hoveredId, setHoveredId }:
           onClick={toggleExpand}
           onMouseEnter={() => setHoveredId(folder.id)}
           onMouseLeave={() => setHoveredId(null)}
-          onTouchStart={handleTouchStart}
+          onTouchStart={(e) => handleTouchStart(e, folder)}
           onTouchEnd={handleTouchEnd}
           className={`
             flex justify-between items-center
@@ -107,6 +131,8 @@ function FolderItem({ folder, notes, index, onDelete, hoveredId, setHoveredId }:
                 setHoveredId={setHoveredId}
                 onDelete={onDelete}
                 useEmptySpace={false}
+                onRename={onRename}
+                isUpdating={isUpdating}
               />
             ))}
           </ul>

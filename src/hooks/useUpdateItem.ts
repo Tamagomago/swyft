@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 type UpdateFn<K extends Tables> = (
   table: K,
-  item: Omit<TableMap[K], 'id' | 'user_id'>,
+  item: TableMap[K],
 ) => Promise<{ data: TableMap[K] | null; error: PostgrestError | null | Error }>;
 
 export function useUpdateItem() {
@@ -21,12 +21,11 @@ export function useUpdateItem() {
   ) {
     setIsUpdating(true);
     try {
+      console.log(item);
       const { data, error } = await updateFn(table, item);
       if (error) throw error;
 
-      if (data) {
-        await queryClient.invalidateQueries({ queryKey: [table] });
-      }
+      await queryClient.invalidateQueries({ queryKey: [table] });
     } catch (err) {
       setError(err instanceof Error ? err.message : `Error creating ${label}.`);
     } finally {
