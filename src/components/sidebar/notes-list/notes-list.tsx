@@ -13,6 +13,7 @@ import { useCreateItem } from '@/hooks/useCreateItem';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { createItem, deleteItem, updateItem } from '@/lib/notes';
 import { useUpdateItem } from '@/hooks/useUpdateItem';
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
 interface NoteListProps {
   noteCreation: ReturnType<typeof useCreating>;
@@ -81,55 +82,69 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
     isUpdating,
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const noteId = active.id as string;
+      const folderId = over.id as string;
+
+      const noteToUpdate = notes?.find((n) => n.id === noteId);
+
+      if (noteToUpdate) {
+        return submitUpdate({ ...noteToUpdate, folder_id: folderId });
+      }
+    }
+  };
+
   return (
-    <div className="font-medium text-sm text-muted w-full h-full overflow-y-auto overflow-x-visible">
-      <ul className="flex flex-col gap-1">
-        {/* Folders */}
-        {folders?.map((folder, index) => (
-          <FolderItem
-            key={folder.id}
-            folder={folder}
-            notes={folderNotesMap[folder.id] || []}
-            index={index}
-            onRename={(T: Notes | Folders) => submitUpdate(T)}
-            {...commonProps}
-          />
-        ))}
+    <DndContext onDragEnd={handleDragEnd}>
+      <div className="font-medium text-sm text-muted w-full h-full overflow-x-visible">
+        <ul className="flex flex-col gap-1">
+          {/* Folders */}
+          {folders?.map((folder, index) => (
+            <FolderItem
+              key={folder.id}
+              folder={folder}
+              notes={folderNotesMap[folder.id] || []}
+              index={index}
+              onRename={(T: Notes | Folders) => submitUpdate(T)}
+              {...commonProps}
+            />
+          ))}
 
-        {/* Notes */}
-        {topLevelNotes?.map((note, index) => (
-          <NoteItem
-            key={note.id}
-            note={note}
-            index={index}
-            onRename={(N: Notes) => submitUpdate(N)}
-            {...commonProps}
-          />
-        ))}
+          {/* Notes */}
+          {topLevelNotes.map((note) => (
+            <NoteItem
+              key={note.id}
+              note={note}
+              onRename={(N: Notes) => submitUpdate(N)}
+              {...commonProps}
+            />
+          ))}
 
-        {/* Create Note/Folder */}
-        {creatingKind && (
-          <ItemEntry
-            disabled={isCreating}
-            kind={creatingKind}
-            onSubmit={submitCreate}
-            onCancel={creatingKind === 'note' ? noteCreation.cancel : folderCreation.cancel}
+          {/* Create Note/Folder */}
+          {creatingKind && (
+            <ItemEntry
+              disabled={isCreating}
+              kind={creatingKind}
+              onSubmit={submitCreate}
+              onCancel={creatingKind === 'note' ? noteCreation.cancel : folderCreation.cancel}
+            />
+          )}
+          {/* Empty state */}
+          {!notes?.length && !folders?.length && !creatingKind && <p>No notes found.</p>}
+        </ul>
+
+        {/* Delete modal */}
+        {deleteTarget && (
+          <DeleteModal
+            target={deleteTarget}
+            onCancel={() => setDeleteTarget(null)}
+            onConfirm={submitDelete}
           />
         )}
-
-        {/* Empty state */}
-        {!notes?.length && !folders?.length && !creatingKind && <p>No notes found.</p>}
-      </ul>
-
-      {/* Delete modal */}
-      {deleteTarget && (
-        <DeleteModal
-          target={deleteTarget}
-          onCancel={() => setDeleteTarget(null)}
-          onConfirm={submitDelete}
-        />
-      )}
-    </div>
+      </div>
+    </DndContext>
   );
 }
 

@@ -9,10 +9,11 @@ import ItemEntry from '@/components/sidebar/notes-list/item-entry';
 import { isNotes } from '@/lib/utils';
 import { useContextMenuWithLongPress } from '@/hooks/useContextMenuWithLongPress';
 import { useRenameState } from '@/hooks/useRenameState';
+import { CSS } from '@dnd-kit/utilities';
+import { useDraggable } from '@dnd-kit/core';
 
 interface NoteItemProps {
   note: Notes;
-  index: number;
   hoveredId: string | null;
   setHoveredId: (id: string | null) => void;
   onDelete: (note: Notes) => void;
@@ -23,7 +24,6 @@ interface NoteItemProps {
 
 function NoteItem({
   note,
-  index,
   hoveredId,
   setHoveredId,
   onDelete,
@@ -63,23 +63,34 @@ function NoteItem({
     );
   }
 
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: note.id,
+  });
+  const style = {
+    transform: transform ? CSS.Transform.toString({ ...transform, x: 0 }) : undefined,
+  };
+
   return (
     <>
       <li
-        tabIndex={index}
         key={note.id}
-        onMouseEnter={() => setHoveredId(note.id)}
-        onMouseLeave={() => setHoveredId(null)}
-        onTouchStart={(e) => handleTouchStart(e, note)}
-        onTouchEnd={handleTouchEnd}
-        onClick={() => handleNoteClick(note.id)}
+        ref={setNodeRef}
+        style={style}
+        {...listeners}
+        {...attributes}
+        onMouseEnter={() => !isDragging && setHoveredId(note.id)}
+        onMouseLeave={() => !isDragging && setHoveredId(null)}
+        onTouchStart={!isDragging ? (e) => handleTouchStart(e, note) : undefined}
+        onTouchEnd={!isDragging ? handleTouchEnd : undefined}
+        onClick={!isDragging ? () => handleNoteClick(note.id) : undefined}
         className={`
         hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer 
-        transition-all hover:font-bold hover:scale-102 select-none
+        transition-colors hover:font-bold hover:scale-102 select-none
         w-full flex justify-between items-center min-w-0
         ${selectedId === note.id ? 'bg-muted/20 font-bold' : ''}
         `}
         onContextMenu={(e) => {
+          if (isDragging) return;
           openMenu(e, note);
         }}
       >
@@ -96,7 +107,7 @@ function NoteItem({
           </div>
         </div>
 
-        {hoveredId === note.id && (
+        {hoveredId === note.id && !isDragging && (
           <RiDeleteBin6Line
             size={15}
             className="hover:text-error cursor-pointer"
@@ -107,9 +118,11 @@ function NoteItem({
           />
         )}
       </li>
-      {menu && <ContextMenu x={menu.x} y={menu.y} items={contextMenuItems} onClose={closeMenu} />}
+      {menu && !isDragging && (
+        <ContextMenu x={menu.x} y={menu.y} items={contextMenuItems} onClose={closeMenu} />
+      )}
     </>
   );
 }
 
-export default NoteItem;
+export default React.memo(NoteItem);

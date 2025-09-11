@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { RiDeleteBin6Line, RiFolder2Line, RiArrowRightSLine, RiFileEditLine } from 'react-icons/ri';
-import { CreateKind, Folders, Notes } from '@/types/types';
+import { Folders, Notes } from '@/types/types';
 import NoteItem from '@/components/sidebar/notes-list/note-item';
 import ContextMenu from '@/components/ContextMenu';
 import ItemEntry from '@/components/sidebar/notes-list/item-entry';
 import { isNotes } from '@/lib/utils';
 import { useRenameState } from '@/hooks/useRenameState';
 import { useContextMenuWithLongPress } from '@/hooks/useContextMenuWithLongPress';
+import { useDroppable } from '@dnd-kit/core';
 
 interface FolderItemProps {
   folder: Folders;
@@ -46,6 +47,9 @@ function FolderItem({
     },
   ];
 
+  // Droppable
+  const { isOver, setNodeRef } = useDroppable({ id: folder.id });
+
   if (isRenaming) {
     return (
       <ItemEntry
@@ -70,6 +74,7 @@ function FolderItem({
           onClick={() => {
             toggleExpand();
           }}
+          ref={setNodeRef}
           onMouseEnter={() => setHoveredId(folder.id)}
           onMouseLeave={() => setHoveredId(null)}
           onTouchStart={(e) => handleTouchStart(e, folder)}
@@ -78,6 +83,7 @@ function FolderItem({
             flex justify-between items-center
             hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer
             transition-all hover:font-bold hover:scale-102 truncate select-none
+            ${isOver ? 'bg-muted/20 font-bold' : ''}
           `}
           onContextMenu={(e) => {
             openMenu(e, folder);
@@ -124,11 +130,10 @@ function FolderItem({
           `}
         >
           <ul>
-            {notes.map((note, i) => (
+            {notes.map((note) => (
               <NoteItem
                 key={note.id}
                 note={note}
-                index={i}
                 hoveredId={hoveredId}
                 setHoveredId={setHoveredId}
                 onDelete={onDelete}
