@@ -50,7 +50,6 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
     : folderCreation.isCreating
       ? 'folder'
       : null;
-
   const globalError = deleteError || createError || notesError || foldersError || updateError;
 
   // Handlers
@@ -75,10 +74,15 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   if (globalError) return <p className="text-muted">An error occurred.</p>;
 
   // Common props
-  const commonProps = { hoveredId, setHoveredId, onDelete: setDeleteTarget, isUpdating };
+  const commonProps = {
+    hoveredId,
+    setHoveredId,
+    onDelete: setDeleteTarget,
+    isUpdating,
+  };
 
   return (
-    <div className="font-medium text-sm text-muted w-full h-full overflow-y-aut overflow-x-visible">
+    <div className="font-medium text-sm text-muted w-full h-full overflow-y-auto overflow-x-visible">
       <ul className="flex flex-col gap-1">
         {/* Folders */}
         {folders?.map((folder, index) => (
@@ -86,8 +90,8 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
             key={folder.id}
             folder={folder}
             notes={folderNotesMap[folder.id] || []}
-            onRename={(f) => submitUpdate(f)}
             index={index}
+            onRename={(T: Notes | Folders) => submitUpdate(T)}
             {...commonProps}
           />
         ))}
@@ -98,7 +102,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
             key={note.id}
             note={note}
             index={index}
-            onRename={(n) => submitUpdate(n)}
+            onRename={(N: Notes) => submitUpdate(N)}
             {...commonProps}
           />
         ))}

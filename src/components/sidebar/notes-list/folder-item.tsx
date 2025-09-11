@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { RiDeleteBin6Line, RiFolder2Line, RiArrowRightSLine, RiFileEditLine } from 'react-icons/ri';
-import { Folders, Notes } from '@/types/types';
+import { CreateKind, Folders, Notes } from '@/types/types';
 import NoteItem from '@/components/sidebar/notes-list/note-item';
 import ContextMenu from '@/components/ContextMenu';
 import ItemEntry from '@/components/sidebar/notes-list/item-entry';
@@ -8,7 +8,7 @@ import { isNotes } from '@/lib/utils';
 import { useRenameState } from '@/hooks/useRenameState';
 import { useContextMenuWithLongPress } from '@/hooks/useContextMenuWithLongPress';
 
-interface NotesFolderProps {
+interface FolderItemProps {
   folder: Folders;
   notes: Notes[];
   index: number;
@@ -28,7 +28,7 @@ function FolderItem({
   setHoveredId,
   onRename,
   isUpdating,
-}: NotesFolderProps) {
+}: FolderItemProps) {
   const [expanded, setExpanded] = useState(false);
   const toggleExpand = () => setExpanded((prev) => !prev);
   const { openMenu, menu, closeMenu, handleTouchStart, handleTouchEnd } =
@@ -67,7 +67,9 @@ function FolderItem({
       <li key={folder.id} tabIndex={index} className="flex flex-col w-full">
         {/* Folder Header */}
         <div
-          onClick={toggleExpand}
+          onClick={() => {
+            toggleExpand();
+          }}
           onMouseEnter={() => setHoveredId(folder.id)}
           onMouseLeave={() => setHoveredId(null)}
           onTouchStart={(e) => handleTouchStart(e, folder)}
