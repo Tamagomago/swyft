@@ -13,7 +13,8 @@ import { useCreateItem } from '@/hooks/useCreateItem';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { createItem, deleteItem, updateItem } from '@/lib/notes';
 import { useUpdateItem } from '@/hooks/useUpdateItem';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, MouseSensor, useSensor } from '@dnd-kit/core';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface NoteListProps {
   noteCreation: ReturnType<typeof useCreating>;
@@ -21,6 +22,7 @@ interface NoteListProps {
 }
 
 function NotesList({ noteCreation, folderCreation }: NoteListProps) {
+  const queryClient = useQueryClient();
   // Hooks
   const { handleCreateItem, isCreating, error: createError } = useCreateItem();
   const { handleDeleteItem, error: deleteError } = useDeleteItem();
@@ -70,9 +72,28 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
     return await handleUpdateItem(type, item, updateItem, type);
   };
 
-  // Early exits
-  if (notesLoading || foldersLoading) return <SkeletonList count={7} />;
-  if (globalError) return <p className="text-muted">An error occurred.</p>;
+  // dnd utils
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const noteId = active.id as string;
+      const folderId = over.id as string;
+      const noteToUpdate = notes?.find((n) => n.id === noteId);
+      if (noteToUpdate) {
+        // Optimistic Update
+        queryClient.setQueryData<Notes[]>(['notes'], (old) => {
+          if (!old) return old;
+          return old.map((n) => (n.id === noteId ? { ...n, folder_id: folderId } : n));
+        });
+        return submitUpdate({ ...noteToUpdate, folder_id: folderId });
+      }
+    }
+  };
 
   // Common props
   const commonProps = {
@@ -82,22 +103,12 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
     isUpdating,
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const noteId = active.id as string;
-      const folderId = over.id as string;
-
-      const noteToUpdate = notes?.find((n) => n.id === noteId);
-
-      if (noteToUpdate) {
-        return submitUpdate({ ...noteToUpdate, folder_id: folderId });
-      }
-    }
-  };
+  // Early exits
+  if (notesLoading || foldersLoading) return <SkeletonList count={7} />;
+  if (globalError) return <p className="text-muted">An error occurred.</p>;
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={handleDragEnd} sensors={[mouseSensor]}>
       <div className="font-medium text-sm text-muted w-full h-full overflow-x-visible">
         <ul className="flex flex-col gap-1">
           {/* Folders */}

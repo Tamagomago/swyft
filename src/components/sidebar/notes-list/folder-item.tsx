@@ -150,4 +150,4 @@ function FolderItem({
   );
 }
 
-export default FolderItem;
+export default React.memo(FolderItem);
