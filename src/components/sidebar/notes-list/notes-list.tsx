@@ -13,8 +13,16 @@ import { useCreateItem } from '@/hooks/useCreateItem';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { createItem, deleteItem, updateItem } from '@/lib/notes';
 import { useUpdateItem } from '@/hooks/useUpdateItem';
-import { DndContext, DragEndEvent, MouseSensor, useSensor } from '@dnd-kit/core';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  MouseSensor,
+  useSensor,
+} from '@dnd-kit/core';
 import { useQueryClient } from '@tanstack/react-query';
+import { MdNotes } from 'react-icons/md';
 
 interface NoteListProps {
   noteCreation: ReturnType<typeof useCreating>;
@@ -46,6 +54,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   // State
   const [deleteTarget, setDeleteTarget] = useState<Notes | Folders | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [activeNote, setActiveNote] = useState<Notes | null>(null);
 
   // Context
   const creatingKind: CreateKind | null = noteCreation.isCreating
@@ -78,21 +87,39 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
       distance: 10,
     },
   });
+
+  const handleDragStart = (event: DragStartEvent) => {
+    if (event.active.data.current?.note) {
+      setActiveNote(event.active.data.current.note);
+    }
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const noteId = active.id as string;
-      const folderId = over.id as string;
-      const noteToUpdate = notes?.find((n) => n.id === noteId);
-      if (noteToUpdate) {
-        // Optimistic Update
-        queryClient.setQueryData<Notes[]>(['notes'], (old) => {
-          if (!old) return old;
-          return old.map((n) => (n.id === noteId ? { ...n, folder_id: folderId } : n));
-        });
-        return submitUpdate({ ...noteToUpdate, folder_id: folderId });
-      }
-    }
+    const prevNotes = queryClient.getQueryData<Notes[]>(['notes']);
+
+    if (!active?.id || !prevNotes) return;
+
+    const noteId = active.id as string;
+    // if not over a folder, update the note's folder_id to null
+    const folderId = over?.id ? (over.id as string) : null;
+    const noteToUpdate = notes?.find((n) => n.id === noteId);
+
+    if (!noteToUpdate) return;
+    if (noteToUpdate.folder_id === folderId) return;
+
+    const updatedNote = { ...noteToUpdate, folder_id: folderId };
+
+    // Optimistic update
+    queryClient.setQueryData<Notes[]>(
+      ['notes'],
+      (old) => old?.map((n) => (n.id === noteId ? updatedNote : n)) ?? [],
+    );
+
+    submitUpdate(updatedNote).catch(() => {
+      // Rollback if request fails
+      queryClient.setQueryData(['notes'], prevNotes);
+    });
   };
 
   // Common props
@@ -108,7 +135,7 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
   if (globalError) return <p className="text-muted">An error occurred.</p>;
 
   return (
-    <DndContext onDragEnd={handleDragEnd} sensors={[mouseSensor]}>
+    <DndContext onDragEnd={handleDragEnd} sensors={[mouseSensor]} onDragStart={handleDragStart}>
       <div className="font-medium text-sm text-muted w-full h-full overflow-x-visible">
         <ul className="flex flex-col gap-1">
           {/* Folders */}
@@ -132,6 +159,16 @@ function NotesList({ noteCreation, folderCreation }: NoteListProps) {
               {...commonProps}
             />
           ))}
+
+          {/* Drag Overlay */}
+          <DragOverlay>
+            {activeNote ? (
+              <div className="flex items-center gap-2 px-2 py-1 rounded-md text-foreground">
+                <MdNotes size={17} />
+                <span className="truncate text-foreground">{activeNote.title}</span>
+              </div>
+            ) : null}
+          </DragOverlay>
 
           {/* Create Note/Folder */}
           {creatingKind && (

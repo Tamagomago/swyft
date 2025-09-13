@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client';
-import { Folders, Notes, TableMap, Tables } from '@/types/types';
+import { TableMap, Tables } from '@/types/types';
 import { PostgrestError } from '@supabase/supabase-js';
 
 const supabase = createClient();
