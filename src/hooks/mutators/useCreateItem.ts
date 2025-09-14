@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Tables, TableMap } from '@/types/types';
 import { PostgrestError } from '@supabase/supabase-js';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useCreating from '@/hooks/useCreating';
-import { useRouter } from 'next/navigation';
 
 type CreateFn<K extends Tables> = (
   table: K,

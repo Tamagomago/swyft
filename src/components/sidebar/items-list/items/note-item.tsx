@@ -4,11 +4,11 @@ import { RiDeleteBin6Line, RiFileEditLine } from 'react-icons/ri';
 import { Folders, Notes } from '@/types/types';
 import { useRouter } from 'next/navigation';
 import { useSidebarStore } from '@/store/sidebar';
-import ContextMenu from '@/components/ContextMenu';
-import ItemEntry from '@/components/sidebar/notes-list/item-entry';
+import ContextMenu from '@/components/sidebar/context-menu';
+import ItemEntry from '@/components/sidebar/items-list/input/item-entry';
 import { isNotes } from '@/lib/utils';
-import { useContextMenuWithLongPress } from '@/hooks/useContextMenuWithLongPress';
-import { useRenameState } from '@/hooks/useRenameState';
+import { useContextMenuWithLongPress } from '@/hooks/context-menu/useContextMenuWithLongPress';
+import { useRenaming } from '@/hooks/useRenaming';
 import { useDraggable } from '@dnd-kit/core';
 import { clsx } from 'clsx';
 
@@ -33,7 +33,7 @@ function NoteItem({
 }: NoteItemProps) {
   const router = useRouter();
   const { selectedId, setSelectedId } = useSidebarStore();
-  const { isRenaming, startRenaming, stopRenaming } = useRenameState();
+  const { isRenaming, startRenaming, stopRenaming } = useRenaming();
 
   const { openMenu, menu, closeMenu, handleTouchStart, handleTouchEnd } =
     useContextMenuWithLongPress<Notes | Folders>();

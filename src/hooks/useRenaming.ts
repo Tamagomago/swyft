@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function useRenameState() {
+export function useRenaming() {
   const [isRenaming, setIsRenaming] = React.useState(false);
   return {
     isRenaming,

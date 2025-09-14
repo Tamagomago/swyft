@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useContextMenu } from '@/hooks/useContextMenu';
+import { useContextMenu } from '@/hooks/context-menu/useContextMenu';
 
 export function useContextMenuWithLongPress<T>() {
   const { openMenu, menu, closeMenu } = useContextMenu<T>();

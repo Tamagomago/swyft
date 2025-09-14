@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Controls from '@/components/sidebar/controls';
-import NotesList from '@/components/sidebar/notes-list/notes-list';
+import ItemsList from '@/components/sidebar/items-list/items-list';
 import { useSidebarStore } from '@/store/sidebar';
 import useCreating from '@/hooks/useCreating';
 import { QueryClient } from '@tanstack/query-core';
@@ -67,7 +67,7 @@ function Sidebar({ className }: SidebarProps) {
         ref={sidebarRef}
       >
         <Controls onAddNote={noteCreation.start} onAddFolder={folderCreation.start} />
-        <NotesList noteCreation={noteCreation} folderCreation={folderCreation} />
+        <ItemsList noteCreation={noteCreation} folderCreation={folderCreation} />
       </div>
     </QueryClientProvider>
   );

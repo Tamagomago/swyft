@@ -21,7 +21,6 @@ export function useUpdateItem() {
   ) {
     setIsUpdating(true);
     try {
-      console.log(item);
       const { error } = await updateFn(table, item);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: [table] });

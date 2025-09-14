@@ -1,5 +1,5 @@
 import React from 'react';
-import NoteInput from '@/components/sidebar/notes-list/note-input';
+import NoteInput from '@/components/sidebar/items-list/input/note-input';
 import { CreateKind, Folders, Notes } from '@/types/types';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 

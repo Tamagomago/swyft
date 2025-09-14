@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { RiDeleteBin6Line, RiFolder2Line, RiArrowRightSLine, RiFileEditLine } from 'react-icons/ri';
 import { Folders, Notes } from '@/types/types';
-import NoteItem from '@/components/sidebar/notes-list/note-item';
-import ContextMenu from '@/components/ContextMenu';
-import ItemEntry from '@/components/sidebar/notes-list/item-entry';
+import NoteItem from '@/components/sidebar/items-list/items/note-item';
+import ContextMenu from '@/components/sidebar/context-menu';
+import ItemEntry from '@/components/sidebar/items-list/input/item-entry';
 import { isNotes } from '@/lib/utils';
-import { useRenameState } from '@/hooks/useRenameState';
-import { useContextMenuWithLongPress } from '@/hooks/useContextMenuWithLongPress';
+import { useRenaming } from '@/hooks/useRenaming';
+import { useContextMenuWithLongPress } from '@/hooks/context-menu/useContextMenuWithLongPress';
 import { useDroppable } from '@dnd-kit/core';
 import { clsx } from 'clsx';
 
@@ -35,7 +35,7 @@ function FolderItem({
   const toggleExpand = () => setExpanded((prev) => !prev);
   const { openMenu, menu, closeMenu, handleTouchStart, handleTouchEnd } =
     useContextMenuWithLongPress<Notes | Folders>();
-  const { isRenaming, startRenaming, stopRenaming } = useRenameState();
+  const { isRenaming, startRenaming, stopRenaming } = useRenaming();
   const contextMenuItems = [
     { icon: RiDeleteBin6Line, name: 'Delete', action: () => onDelete(folder) },
     {
