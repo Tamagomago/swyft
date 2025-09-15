@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { CreateKind, Folders, Notes } from '@/types/types';
 import SkeletonList from '@/components/ui/skeleton-list';
 import useCreating from '@/hooks/useCreating';
-
 import NoteItem from '@/components/sidebar/items-list/items/note-item';
 import FolderItem from '@/components/sidebar/items-list/items/folder-item';
 import ItemEntry from '@/components/sidebar/items-list/input/item-entry';
@@ -14,12 +13,21 @@ import { useNotesAndFolders } from '@/hooks/items-list/useNotesAndFolders';
 import { useItemMutations } from '@/hooks/items-list/useItemMutations';
 import { useDnd } from '@/hooks/items-list/useDnd';
 
-interface NoteListProps {
+interface ItemListProps {
   noteCreation: ReturnType<typeof useCreating>;
   folderCreation: ReturnType<typeof useCreating>;
 }
 
-function ItemsList({ noteCreation, folderCreation }: NoteListProps) {
+function ItemsList({ noteCreation, folderCreation }: ItemListProps) {
+  const {
+    notes,
+    folders,
+    rootNotes,
+    notesInFolders,
+    loading,
+    error: fetchError,
+  } = useNotesAndFolders();
+
   const {
     submitCreate,
     submitDelete,
@@ -34,15 +42,6 @@ function ItemsList({ noteCreation, folderCreation }: NoteListProps) {
       setDeleteTarget(null);
     },
   });
-
-  const {
-    notes,
-    folders,
-    rootNotes,
-    notesInFolders,
-    loading,
-    error: fetchError,
-  } = useNotesAndFolders();
 
   const { activeNote, mouseSensor, handleDragStart, handleDragEnd } = useDnd(submitUpdate);
 
@@ -67,14 +66,14 @@ function ItemsList({ noteCreation, folderCreation }: NoteListProps) {
     isUpdating,
   };
 
-  // Early exits
+  // Render
   if (loading) return <SkeletonList count={7} />;
   if (globalError) return <p className="text-muted">An error occurred.</p>;
 
   return (
     <DndContext onDragEnd={handleDragEnd} sensors={[mouseSensor]} onDragStart={handleDragStart}>
       <div className="font-medium text-sm text-muted w-full h-full overflow-x-visible">
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col">
           {/* Folders */}
           {folders?.map((folder, index) => (
             <FolderItem

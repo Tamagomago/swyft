@@ -87,7 +87,7 @@ function FolderItem({
           onTouchEnd={handleTouchEnd}
           className={clsx(
             'flex justify-between items-center',
-            'hover:bg-muted/20 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer',
+            'hover:bg-muted/5 py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer',
             'transition-all hover:font-bold hover:scale-102 truncate select-none',
             isOver && 'bg-muted/20 font-bold',
           )}
