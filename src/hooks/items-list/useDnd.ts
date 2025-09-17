@@ -3,7 +3,7 @@ import { Notes } from '@/types/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { DragEndEvent, DragStartEvent, MouseSensor, useSensor } from '@dnd-kit/core';
 
-export function useDnd(submitUpdate: (item: Notes) => Promise<any>) {
+export function useDnd(submitUpdate: (item: Notes) => Promise<void>) {
   const queryClient = useQueryClient();
   const [activeNote, setActiveNote] = useState<Notes | null>(null);
 

@@ -5,7 +5,6 @@
 
 
 :root {
-	--focus-ring: #202020;
 	--error-color: #e5484d;
 }
 
@@ -15,6 +14,8 @@
 	--app-text-primary: #171717;
 	--app-border: #dfdfdf;
 	--app-text-muted: #8e8e8e;
+
+	--focus-ring: #e1e1e1;
 
 	--input-surface: #ececec;
 	--input-border: #dfdfdf;
@@ -37,6 +38,8 @@
 	--app-text-primary: #fafafa;
 	--app-border: #373737;
 	--app-text-muted: #7b7b7b;
+
+	--focus-ring: #2e2e2e;
 
 	--input-surface: #1d1d1d;
 	--input-border: #232323;

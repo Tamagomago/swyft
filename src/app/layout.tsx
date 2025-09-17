@@ -13,8 +13,7 @@ const georgian = Noto_Sans_Georgian({
 
 export const metadata: Metadata = {
   title: 'Swyft | Fast & Simple Note Taking App',
-  description:
-    'A fast and shortcut-based note-taking application built with Next.js and Supabase with simplicity in mind.',
+  description: 'A fast and shortcut-based note-taking application with simplicity in mind.',
 };
 
 async function RootLayout({ children }: { children: React.ReactNode }) {

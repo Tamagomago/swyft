@@ -10,13 +10,23 @@ function ThemeToggle() {
   const setTheme = useThemeStore((state) => state.setTheme);
 
   useEffect(() => {
-    if (theme) {
-      document.cookie = `theme=${theme};path=/;`;
-      document.querySelector('html')?.setAttribute('data-theme', theme);
-    } else {
-      setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (!theme) {
+      const cookieTheme = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('theme='))
+        ?.split('=')[1] as 'light' | 'dark' | undefined;
+
+      setTheme(
+        cookieTheme ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+      );
+      return;
     }
+    document.cookie = `theme=${theme};path=/;`;
+    document.querySelector('html')?.setAttribute('data-theme', theme);
   }, [theme, setTheme]);
+
+  if (!theme) return null; // wait until the theme is resolved
 
   return (
     <Button
