@@ -1,52 +1,38 @@
 import { Notes, Folders, CreateKind } from '@/types/types';
 import { isNotes } from '@/lib/utils';
-import { createItem, deleteItem, updateItem } from '@/lib/notes';
 import { useCreateItem } from '@/hooks/mutators/useCreateItem';
 import { useDeleteItem } from '@/hooks/mutators/useDeleteItem';
 import { useUpdateItem } from '@/hooks/mutators/useUpdateItem';
-import useCreating from '@/hooks/useCreating';
 
-interface UseItemMutationsOptions {
-  noteCreation: ReturnType<typeof useCreating>;
-  folderCreation: ReturnType<typeof useCreating>;
-  onDeleteFinished?: () => void; // Optional callback
-}
-
-export function useItemMutations({
-  noteCreation,
-  folderCreation,
-  onDeleteFinished,
-}: UseItemMutationsOptions) {
+export function useItemMutations() {
   // Mutations
   const { handleCreateItem, isCreating, error: createError } = useCreateItem();
   const { handleDeleteItem, error: deleteError } = useDeleteItem();
   const { handleUpdateItem, isUpdating, error: updateError } = useUpdateItem();
 
   // Handlers
-  const submitCreate = async (item: Notes | Folders) => {
-    const type = isNotes(item) ? 'notes' : 'folders';
-    const creation = isNotes(item) ? noteCreation : folderCreation;
-    return await handleCreateItem(type, item, createItem, creation, type);
+  const submitCreate = async (item: Notes | Folders, createKind: Exclude<CreateKind, null>) => {
+    return await handleCreateItem(createKind, item);
   };
 
   const submitDelete = async (item: Notes | Folders) => {
-    const type = isNotes(item) ? 'notes' : 'folders';
-    return await handleDeleteItem(type, item, deleteItem, type, onDeleteFinished);
+    const type = isNotes(item) ? 'note' : 'folder';
+    return await handleDeleteItem(type, item);
   };
 
   const submitUpdate = async (item: Notes | Folders) => {
-    const type = isNotes(item) ? 'notes' : 'folders';
-    return await handleUpdateItem(type, item, updateItem, type);
+    const type = isNotes(item) ? 'note' : 'folder';
+    return await handleUpdateItem(type, item);
   };
 
   const globalError = createError || deleteError || updateError;
+  const loading = isCreating || isUpdating;
 
   return {
     submitCreate,
     submitDelete,
     submitUpdate,
-    isCreating,
-    isUpdating,
+    loading,
     error: globalError,
   };
 }

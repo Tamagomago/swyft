@@ -1,45 +1,37 @@
 import { useState } from 'react';
 import { Tables, TableMap } from '@/types/types';
-import { PostgrestError } from '@supabase/supabase-js';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useCreating from '@/hooks/useCreating';
-
-type CreateFn<K extends Tables> = (
-  table: K,
-  item: Omit<TableMap[K], 'id' | 'user_id'>,
-) => Promise<{ data: TableMap[K] | null; error: PostgrestError | null | Error }>;
+import { useQueryClient } from '@tanstack/react-query';
+import { useSidebarStore } from '@/store/sidebar';
+import { createItem } from '@/lib/notes';
 
 export function useCreateItem() {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { cancelCreate } = useSidebarStore();
 
   async function handleCreateItem<K extends Tables>(
     table: K,
     item: Omit<TableMap[K], 'id' | 'user_id'>,
-    createFn: CreateFn<K>,
-    creation: ReturnType<typeof useCreating>,
-    label: string,
   ) {
     const isEmpty =
-      table === 'notes' ? !('title' in item && item.title) : !('name' in item && item.name);
+      table === 'note' ? !('title' in item && item.title) : !('name' in item && item.name);
 
     if (isEmpty) {
-      creation.cancel();
+      cancelCreate();
       return;
     }
 
     setIsCreating(true);
-    try {
-      const { data, error } = await createFn(table, item);
-      if (error) throw error;
 
+    try {
+      const { data } = await createItem(table, item);
       if (data) {
         await queryClient.invalidateQueries({ queryKey: [table] });
       }
-      creation.created();
+      cancelCreate();
     } catch (err) {
-      setError(err instanceof Error ? err.message : `Error creating ${label}.`);
+      setError(err instanceof Error ? err.message : `Error creating ${table}.`);
     } finally {
       setIsCreating(false);
     }

@@ -14,10 +14,12 @@ export interface Folders {
   name: string;
   createdAt: Date;
 }
-export type CreateKind = 'note' | 'folder';
+
+export type CreateKind = 'note' | 'folder' | null;
 
 export type TableMap = {
-  notes: Notes;
-  folders: Folders;
+  note: Notes;
+  folder: Folders;
 };
+
 export type Tables = keyof TableMap;

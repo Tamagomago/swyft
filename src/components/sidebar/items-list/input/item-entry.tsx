@@ -6,7 +6,7 @@ import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 interface CreateItemProps {
   kind: CreateKind;
   disabled: boolean;
-  onSubmit: (input: Notes | Folders) => void;
+  onSubmit: (input: Notes | Folders, createKind: Exclude<CreateKind, null>) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -26,8 +26,8 @@ function ItemEntry({ kind, disabled, onCancel, onSubmit }: CreateItemProps) {
         disabled={disabled}
         onSubmit={(input) =>
           kind === 'note'
-            ? onSubmit({ title: input } as Notes)
-            : onSubmit({ name: input } as Folders)
+            ? onSubmit({ title: input } as Notes, 'note')
+            : onSubmit({ name: input } as Folders, 'folder')
         }
         onCancel={onCancel}
       />

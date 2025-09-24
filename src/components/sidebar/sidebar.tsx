@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import Controls from '@/components/sidebar/controls';
 import ItemsList from '@/components/sidebar/items-list/items-list';
 import { useSidebarStore } from '@/store/sidebar';
-import useCreating from '@/hooks/useCreating';
 import { QueryClient } from '@tanstack/query-core';
 import { QueryClientProvider } from '@tanstack/react-query';
 
@@ -13,11 +12,8 @@ interface SidebarProps {
 }
 
 function Sidebar({ className }: SidebarProps) {
-  const { isOpen, close } = useSidebarStore();
+  const { isOpen, close, startCreate, cancelCreate } = useSidebarStore();
   const sidebarRef = React.useRef<HTMLDivElement>(null);
-
-  const noteCreation = useCreating();
-  const folderCreation = useCreating();
 
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
@@ -28,20 +24,19 @@ function Sidebar({ className }: SidebarProps) {
         (e.metaKey && e.key.toLowerCase() === 'k')
       ) {
         e.preventDefault();
-        noteCreation.start();
+        startCreate('note');
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [noteCreation]);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
-      noteCreation.cancel();
-      folderCreation.cancel();
+      cancelCreate();
     }
-  }, [isOpen, noteCreation.cancel, folderCreation.cancel]);
+  }, [isOpen]);
 
   useEffect(() => {
     const handler = (e: MouseEvent | TouchEvent) => {
@@ -66,8 +61,8 @@ function Sidebar({ className }: SidebarProps) {
         `}
         ref={sidebarRef}
       >
-        <Controls onAddNote={noteCreation.start} onAddFolder={folderCreation.start} />
-        <ItemsList noteCreation={noteCreation} folderCreation={folderCreation} />
+        <Controls onAddNote={() => startCreate('note')} onAddFolder={() => startCreate('folder')} />
+        <ItemsList />
       </div>
     </QueryClientProvider>
   );

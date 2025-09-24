@@ -1,8 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import { CreateKind, Folders, Notes } from '@/types/types';
+import { Folders, Notes } from '@/types/types';
 import SkeletonList from '@/components/ui/skeleton-list';
-import useCreating from '@/hooks/useCreating';
 import NoteItem from '@/components/sidebar/items-list/items/note-item';
 import FolderItem from '@/components/sidebar/items-list/items/folder-item';
 import ItemEntry from '@/components/sidebar/items-list/input/item-entry';
@@ -12,19 +11,17 @@ import { MdNotes } from 'react-icons/md';
 import { useNotesAndFolders } from '@/hooks/items-list/useNotesAndFolders';
 import { useItemMutations } from '@/hooks/items-list/useItemMutations';
 import { useDnd } from '@/hooks/items-list/useDnd';
+import { useSidebarStore } from '@/store/sidebar';
 
-interface ItemListProps {
-  noteCreation: ReturnType<typeof useCreating>;
-  folderCreation: ReturnType<typeof useCreating>;
-}
+function ItemsList() {
+  const { createKind, cancelCreate } = useSidebarStore();
 
-function ItemsList({ noteCreation, folderCreation }: ItemListProps) {
   const {
     notes,
     folders,
     rootNotes,
     notesInFolders,
-    loading,
+    loading: isFetching,
     error: fetchError,
   } = useNotesAndFolders();
 
@@ -32,16 +29,9 @@ function ItemsList({ noteCreation, folderCreation }: ItemListProps) {
     submitCreate,
     submitDelete,
     submitUpdate,
-    isCreating,
-    isUpdating,
+    loading: isUpdating,
     error: mutationError,
-  } = useItemMutations({
-    noteCreation,
-    folderCreation,
-    onDeleteFinished: () => {
-      setDeleteTarget(null);
-    },
-  });
+  } = useItemMutations();
 
   const { activeNote, mouseSensor, handleDragStart, handleDragEnd } = useDnd(submitUpdate);
 
@@ -50,13 +40,6 @@ function ItemsList({ noteCreation, folderCreation }: ItemListProps) {
   // State
   const [deleteTarget, setDeleteTarget] = useState<Notes | Folders | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-
-  // Context
-  const creatingKind: CreateKind | null = noteCreation.isCreating
-    ? 'note'
-    : folderCreation.isCreating
-      ? 'folder'
-      : null;
 
   // Common props
   const commonProps = {
@@ -67,7 +50,7 @@ function ItemsList({ noteCreation, folderCreation }: ItemListProps) {
   };
 
   // Render
-  if (loading) return <SkeletonList count={7} />;
+  if (isFetching) return <SkeletonList count={7} />;
   if (globalError) return <p className="text-muted">An error occurred.</p>;
 
   return (
@@ -107,16 +90,17 @@ function ItemsList({ noteCreation, folderCreation }: ItemListProps) {
           </DragOverlay>
 
           {/* Create Note/Folder */}
-          {creatingKind && (
+          {createKind && (
             <ItemEntry
-              disabled={isCreating}
-              kind={creatingKind}
+              disabled={isUpdating}
+              kind={createKind}
               onSubmit={submitCreate}
-              onCancel={creatingKind === 'note' ? noteCreation.cancel : folderCreation.cancel}
+              onCancel={cancelCreate}
             />
           )}
+
           {/* Empty state */}
-          {!notes?.length && !folders?.length && !creatingKind && <p>No notes found.</p>}
+          {!notes?.length && !folders?.length && !createKind && <p>No notes found.</p>}
         </ul>
 
         {/* Delete modal */}
@@ -124,7 +108,10 @@ function ItemsList({ noteCreation, folderCreation }: ItemListProps) {
           <DeleteModal
             target={deleteTarget}
             onCancel={() => setDeleteTarget(null)}
-            onConfirm={submitDelete}
+            onConfirm={async (item) => {
+              await submitDelete(item);
+              setDeleteTarget(null);
+            }}
           />
         )}
       </div>

@@ -11,7 +11,7 @@ import { isNotes } from '@/lib/utils';
 interface DeleteModalProps {
   target: Notes | Folders | null;
   onCancel: () => void;
-  onConfirm: (target: Notes | Folders) => Promise<void>;
+  onConfirm: (target: Notes | Folders) => void;
 }
 
 export default function DeleteModal({ target, onCancel, onConfirm }: DeleteModalProps) {

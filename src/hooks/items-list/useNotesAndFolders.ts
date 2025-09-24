@@ -2,9 +2,9 @@ import { Notes } from '@/types/types';
 import useGetItems from '@/hooks/useGetItems';
 
 export function useNotesAndFolders() {
-  const { data: notes, isLoading: notesLoading, error: notesError } = useGetItems('notes');
+  const { data: notes, isLoading: notesLoading, error: notesError } = useGetItems('note');
 
-  const { data: folders, isLoading: foldersLoading, error: foldersError } = useGetItems('folders');
+  const { data: folders, isLoading: foldersLoading, error: foldersError } = useGetItems('folder');
 
   const rootNotes = notes?.filter((n) => !n.folder_id) || [];
 

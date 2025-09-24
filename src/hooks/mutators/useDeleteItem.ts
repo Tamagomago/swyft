@@ -1,14 +1,9 @@
 import { useState } from 'react';
 import { Tables, TableMap } from '@/types/types';
-import { PostgrestError } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { isNotes } from '@/lib/utils';
-
-type DeleteFn<K extends Tables> = (
-  table: K,
-  id: string,
-) => Promise<{ error: Error | PostgrestError | null }>;
+import { deleteItem } from '@/lib/notes';
 
 export function useDeleteItem() {
   const queryClient = useQueryClient();
@@ -19,23 +14,17 @@ export function useDeleteItem() {
   async function handleDeleteItem<K extends Tables>(
     table: K,
     item: TableMap[K],
-    deleteFn: DeleteFn<K>,
-    label: string,
     onAfterDelete?: () => void,
   ) {
     try {
-      const { error } = await deleteFn(table, item.id);
-      if (error) throw error;
-
+      await deleteItem(table, item.id);
       await queryClient.invalidateQueries({ queryKey: [table] });
-
       if (isNotes(item) && pathname.endsWith(item.id)) {
         router.push('/home');
       }
-
       if (onAfterDelete) onAfterDelete();
     } catch (err) {
-      setError(err instanceof Error ? err.message : `Error deleting ${label}.`);
+      setError(err instanceof Error ? err.message : `Error deleting ${table}.`);
     }
   }
 

@@ -8,16 +8,22 @@ const {
   error: userError,
 } = await supabase.auth.getUser();
 
+// Temporary fix: pluralize table names
+function pluralizeTable(table: string): string {
+  return table + 's';
+}
+
 export async function createItem<T extends Tables>(
   table: T,
   item: Omit<TableMap[T], 'id' | 'user_id'>,
 ): Promise<{ data: TableMap[T] | null; error: PostgrestError | null | Error }> {
   if (!user || userError) throw new Error('User not authenticated');
   const { data, error } = await supabase
-    .from(table)
+    .from(pluralizeTable(table))
     .insert({ ...item, user_id: user.id })
     .select()
     .single();
+  if (error) throw new Error(error.message);
   return { data, error };
 }
 
@@ -25,7 +31,11 @@ export async function getItems<T extends Tables>(
   table: T,
 ): Promise<{ data: TableMap[T][] | null; error: PostgrestError | null | Error }> {
   if (!user || userError) throw new Error('User not authenticated');
-  const { data, error } = await supabase.from(table).select('*').eq('user_id', user.id);
+  const { data, error } = await supabase
+    .from(pluralizeTable(table))
+    .select('*')
+    .eq('user_id', user.id);
+  if (error) throw new Error(error.message);
   return { data, error };
 }
 
@@ -34,7 +44,12 @@ export async function deleteItem<T extends Tables>(
   id: string,
 ): Promise<{ error: PostgrestError | null | Error }> {
   if (!user || userError) throw new Error('User not authenticated');
-  const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', user.id);
+  const { error } = await supabase
+    .from(pluralizeTable(table))
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id);
+  if (error) throw new Error(error.message);
   return { error };
 }
 
@@ -44,10 +59,10 @@ export async function updateItem<T extends Tables>(
 ): Promise<{ data: TableMap[T] | null; error: PostgrestError | null | Error }> {
   if (!user || userError) throw new Error('User not authenticated');
   const { data, error } = await supabase
-    .from(table)
+    .from(pluralizeTable(table))
     .update(item)
     .eq('id', item.id)
     .eq('user_id', user.id);
-  console.log(data, error);
+  if (error) throw new Error(error.message);
   return { data, error };
 }

@@ -19,7 +19,7 @@ export function useDnd(submitUpdate: (item: Notes) => Promise<void>) {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    const prevNotes = queryClient.getQueryData<Notes[]>(['notes']);
+    const prevNotes = queryClient.getQueryData<Notes[]>(['note']);
 
     if (!active?.id || !prevNotes) return;
 
@@ -34,13 +34,13 @@ export function useDnd(submitUpdate: (item: Notes) => Promise<void>) {
 
     // Optimistic update
     queryClient.setQueryData<Notes[]>(
-      ['notes'],
+      ['note'],
       (old) => old?.map((n) => (n.id === noteId ? updatedNote : n)) ?? [],
     );
 
     submitUpdate(updatedNote).catch(() => {
       // Rollback if the update fails
-      queryClient.setQueryData(['notes'], prevNotes);
+      queryClient.setQueryData(['note'], prevNotes);
     });
 
     setActiveNote(null);
