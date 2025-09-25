@@ -136,7 +136,7 @@ function FolderItem({
           `}
         >
           <ul>
-            {notes.map((note) => (
+            {notes.sort().map((note) => (
               <NoteItem
                 key={note.id}
                 note={note}

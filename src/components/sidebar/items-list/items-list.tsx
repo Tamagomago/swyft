@@ -58,7 +58,7 @@ function ItemsList() {
       <div className="font-medium text-sm text-muted w-full h-full overflow-x-visible">
         <ul className="flex flex-col">
           {/* Folders */}
-          {folders?.map((folder, index) => (
+          {folders?.sort().map((folder, index) => (
             <FolderItem
               key={folder.id}
               folder={folder}
@@ -70,7 +70,7 @@ function ItemsList() {
           ))}
 
           {/* Notes */}
-          {rootNotes.map((note) => (
+          {rootNotes.sort().map((note) => (
             <NoteItem
               key={note.id}
               note={note}

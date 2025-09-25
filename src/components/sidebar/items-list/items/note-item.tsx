@@ -90,7 +90,7 @@ function NoteItem({
         className={clsx(
           'py-1 pl-1.5 pr-2.5 rounded-md cursor-pointer select-none w-full flex justify-between items-center min-w-0 my-1',
           selectedId === note.id && 'bg-muted/20 font-bold',
-          'hover:bg-muted/5 hover:font-bold hover:scale-102',
+          selectedId !== note.id && 'hover:bg-muted/5 hover:font-bold hover:scale-102',
         )}
         onContextMenu={(e) => {
           if (isDragging) return;

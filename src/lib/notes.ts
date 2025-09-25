@@ -34,7 +34,8 @@ export async function getItems<T extends Tables>(
   const { data, error } = await supabase
     .from(pluralizeTable(table))
     .select('*')
-    .eq('user_id', user.id);
+    .eq('user_id', user.id)
+    .order(table === 'note' ? 'title' : 'name', { ascending: true });
   if (error) throw new Error(error.message);
   return { data, error };
 }

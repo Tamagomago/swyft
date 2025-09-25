@@ -1,15 +1,11 @@
-import React from 'react';
-import { RiStickyNoteAddLine } from 'react-icons/ri';
+'use client';
+import { useSidebarStore } from '@/store/sidebar';
 import Button from '@/components/ui/button';
-import { Metadata } from 'next';
+import { RiStickyNoteAddLine } from 'react-icons/ri';
+import React from 'react';
 
-export const metadata: Metadata = {
-  title: 'Home | Swyft',
-  keywords: ['Swyft', 'home', 'dashboard', 'welcome'],
-  description: 'Welcome to Swyft, your personal note-taking app.',
-};
-
-function Page() {
+function WelcomePanel() {
+  const { startCreate } = useSidebarStore();
   return (
     <div className={'text-foreground  flex flex-col gap-4'}>
       <div className={'flex flex-col gap-1 text-muted'}>
@@ -20,6 +16,7 @@ function Page() {
       <h1 className={'text-muted font-light text-sm'}>Select a note from the sidebar or...</h1>
       <div className={'flex gap-2'}>
         <Button
+          onClick={() => startCreate('note')}
           className={
             'border-border flex gap-2 group items-center hover:bg-transparent w-fit hover:border-foreground hover:translate-y-[-2px] transition-all duration-300 ease-in-out border-2 '
           }
@@ -33,7 +30,6 @@ function Page() {
           Ctrl + K
         </span>
       </div>
-
       <h1 className={'text-muted font-extralight text-xs'}>
         Learn the shortcuts by clicking{' '}
         <span className=" inline-block underline transform hover:translate-y-[-2px] transition-all duration-300 ease-in-out">
@@ -45,4 +41,4 @@ function Page() {
   );
 }
 
-export default Page;
+export default WelcomePanel;

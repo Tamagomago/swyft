@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 
 function Navbar() {
   const pathname = usePathname();
-  const isHomeRoute = pathname.startsWith('/home');
+  const isHomeRoute = pathname.startsWith('/notes');
   return (
     <nav
       className={
