@@ -40,7 +40,7 @@ function NoteItem({
 
   const handleNoteClick = (noteId: string) => {
     setSelectedId(noteId);
-    router.push(`/home/${noteId}`);
+    router.push(`/notes/${noteId}`);
   };
 
   const contextMenuItems = [

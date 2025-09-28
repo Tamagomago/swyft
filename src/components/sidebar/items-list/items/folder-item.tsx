@@ -35,6 +35,7 @@ function FolderItem({
   const toggleExpand = () => setExpanded((prev) => !prev);
   const { openMenu, menu, closeMenu, handleTouchStart, handleTouchEnd } =
     useContextMenuWithLongPress<Notes | Folders>();
+
   const { isRenaming, startRenaming, stopRenaming } = useRenaming();
   const contextMenuItems = [
     { icon: RiDeleteBin6Line, name: 'Delete', action: () => onDelete(folder) },

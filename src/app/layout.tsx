@@ -22,7 +22,6 @@ async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme={theme}>
       <body className={`${georgian.variable} w-full min-h-[100dvh] flex justify-center`}>
-        <Navbar />
         {children}
       </body>
     </html>

@@ -8,6 +8,11 @@
 	--error-color: #e5484d;
 }
 
+/*Debug*/
+/** {*/
+/*	outline: 1px solid red;*/
+/*}*/
+
 /* Light theme */
 [data-theme='light'] {
 	--app-surface: #fafafa;
@@ -30,6 +35,8 @@
 
 	--sidebar-surface: #ededed;
 	--skeleton-surface: #ececec;
+
+	--editor-text: #262626;
 }
 
 /* Dark theme */
@@ -54,6 +61,8 @@
 
 	--sidebar-surface: #202020;
 	--skeleton-surface: #555555;
+
+	--editor-text: #d4d4d4;
 }
 
 @theme {
@@ -74,9 +83,24 @@
 	--color-button-hover: var(--button-surface-hover);
 	--color-sidebar-background: var(--sidebar-surface);
 	--color-skeleton-background: var(--skeleton-surface);
+	--color-editor-text: var(--editor-text);
 }
 
 html,
 body {
 	@apply m-0 p-0 box-border;
 }
+
+/* Placeholder (at the top) */
+p.is-editor-empty:first-child::before {
+	color: var(--color-muted);
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	pointer-events: none;
+}
+
+.ProseMirror:focus {
+	outline: none;
+}
+
